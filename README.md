@@ -42,6 +42,28 @@ This workflow does the following things automatically:
 
 
 ## 1: CI
+## Golang CI Workflow Sample
+
+```yaml
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+ SPDX-License-Identifier: Apache-2.0
+---
+name: 'CI'
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  add-to-project:
+    uses: xmidt-org/shared-go/.github/workflows/ci.yml@main
+    with:
+      release-type: library
+    secrets: inherit
+```
 
 ### Inputs
 
@@ -79,6 +101,7 @@ This workflow does the following things automatically:
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

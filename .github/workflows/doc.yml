@@ -1,11 +1,15 @@
-# SPDX-FileCopyrightText: 2023 github.com/gizumon
-# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
 
 name: "Update docs"
 on:
   pull_request:
+    branches:
+      - 'main'
     paths:
       - '.github/workflows/*.yml'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
 
 jobs:
@@ -15,3 +19,63 @@ jobs:
       filepath: README.md
       overwrite: true
       make-pull-request: true
+
+jobs:
+  document:
+    permissions:
+      contents: write
+      pull-requests: write
+
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: Generate Usage Documentation
+        id: documenter
+        uses: gizumon/github-actions-documenter@1057007786b38916b5deef7ac0308a8647c37dc8 # v0.2.1
+        with:
+          should-skip-generate-agenda: true
+
+      - name: Update the file
+        env:
+          DOCUMENT: ${{ steps.documenter.outputs.output }}
+        shell: bash
+        run: |
+          prefix='.shared_workflow_documenter'
+
+          start_line=$(grep -n "<!--\s*@overwrite-anchor=start\s*-->" README.md | grep -oh "^[0-9]*")
+          end_line=$(grep   -n "<!--\s*@overwrite-anchor=end\s*-->"   README.md | grep -oh "^[0-9]*")
+
+          # Ensure empty files are there.
+          touch ${prefix}_start.tmp
+          touch ${prefix}_end.tmp
+
+          # store the part before if start
+          if [ -n "${start_line}" ]; then
+              sed -e "$((${start_line}+1)),\$d" README.md > ${prefix}_start.tmp
+          fi
+
+          # store the part after if end
+          if [ -n "${end_line}" ]; then
+              sed -e "1,$((${end_line}-1))d" README.md > ${prefix}_end.tmp
+          fi
+
+          cat ${prefix}_start.tmp     >  README.md
+          echo "${doc}"               >> README.md
+          cat ${prefix}_end.tmp       >> README.md
+
+          rm ${prefix}_start.tmp
+          rm ${prefix}_end.tmp
+
+      - name: Create Pull Request
+        if: |
+          inputs.dry-run == false
+        uses: peter-evans/create-pull-request@5b4a9f6a9e2af26e5f02351490b90d01eb8ec1e5 # v5.0.0
+        with:
+          title: chore:Update Workflow Documentation
+          body: |
+            Update the github action workflow documentation.
+          branch: update-workflow-documentation
+          token: ${{ github.token }}
+          delete-branch: true

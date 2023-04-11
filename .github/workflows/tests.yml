@@ -68,11 +68,13 @@ jobs:
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:
-      license-skip:         true
-      release-skip-publish: --skip-publish
-      working-directory:    program
-      release-type:         program
-      release-docker:       true
+      license-skip:          true
+      release-skip-publish:  --skip-publish
+      working-directory:     program
+      release-type:          program
+      release-docker:        true
+      release-docker-extras: |
+        main.go
     secrets: inherit
 
   program-tag:
@@ -80,20 +82,23 @@ jobs:
     if: |
       startsWith(github.ref, 'refs/tags/')
     with:
-      copyright-skip:        true
-      build-skip:            true
-      lint-skip:             true
-      license-skip:          true
-      style-skip:            true
-      #tests-skip:            true
-      release-skip-publish:  --skip-publish
-      release-binary-name:   programtest
-      working-directory:     program
-      release-type:          program
-      release-docker:        true
-      release-docker-latest: true
-      release-docker-major:  true
-      release-docker-minor:  true
+      copyright-skip:         true
+      build-skip:             true
+      lint-skip:              true
+      license-skip:           true
+      style-skip:             true
+      #tests-skip:             true
+      release-skip-publish:   --skip-publish
+      release-binary-name:    programtest
+      working-directory:      program
+      release-type:           program
+      release-docker:         true
+      release-docker-latest:  true
+      release-docker-major:   true
+      release-docker-minor:   true
+      release-docker-extras:  |
+        main.go
+        go.mod
     secrets: inherit
 
 

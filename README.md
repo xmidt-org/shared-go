@@ -59,7 +59,7 @@ on:
 
 jobs:
   add-to-project:
-    uses: xmidt-org/shared-go/.github/workflows/ci.yml@main
+    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
     with:
       release-type: library
     secrets: inherit
@@ -101,6 +101,7 @@ jobs:
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

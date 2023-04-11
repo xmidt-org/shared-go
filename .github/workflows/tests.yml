@@ -74,7 +74,7 @@ jobs:
       release-type:          program
       release-docker:        true
       release-docker-extras: |
-        ./program/main.go
+        main.go
     secrets: inherit
 
   program-tag:
@@ -97,8 +97,8 @@ jobs:
       release-docker-major:   true
       release-docker-minor:   true
       release-docker-extras:  |
-        ./program/main.go
-        ./program/go.mod
+        main.go
+        go.mod
     secrets: inherit
 
 

@@ -2,15 +2,15 @@
 # SPDX-License-Identifier: MIT
 
 name: "Update docs"
- on:
-   pull_request:
-     paths:
-       - '.github/workflows/*.yml'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/*.yml'
 
- jobs:
-   test:
-     uses: gizumon/github-actions-documenter/.github/workflows/github-actions-documenter.yml@1057007786b38916b5deef7ac0308a8647c37dc8 # v0.2.1
-     with:
-       filepath: README.md
-       overwrite: true
-       make-pull-request: true
+jobs:
+  test:
+    uses: gizumon/github-actions-documenter/.github/workflows/github-actions-documenter.yml@1057007786b38916b5deef7ac0308a8647c37dc8 # v0.2.1
+    with:
+      filepath: README.md
+      overwrite: true
+      make-pull-request: true

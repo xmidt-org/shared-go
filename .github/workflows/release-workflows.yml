@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+---
+name: 'Release Workflows'
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - '!v2.*'
+      - '!v1.*'
+
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    # Normally don't use a workflow without the @{ref}.  In this case, we want
+    # to run the workflow specified by the branch instead of what is associated
+    # with a reference so we can test that the change works.
+    uses: ./.github/workflows/ci.yml
+    with:
+      build-skip:           true
+      lint-skip:            true
+      license-skip:         true
+      copyright-skip:       true
+      sonarcloud-skip:      true
+      style-skip:           true
+      tests-skip:           true
+      working-directory:    library
+      release-type:         library
+      release-project-name: library
+    secrets: inherit

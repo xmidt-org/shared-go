@@ -1,0 +1,794 @@
+# SPDX-FileCopyrightText: 2022-2023 Comcast Cable Communications Management, LLC
+# SPDX-FileCopyrightText: 2022 Weston Schmidt <weston_schmidt@alumni.purdue.edu>
+# SPDX-License-Identifier: Apache-2.0
+# Copied from github.com/goschtalt/.github
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+
+      # General or common inputs.  These cross cut concerns generally and shouldn't
+      # be included in the more targetted sections below.
+      go-version:
+        description: "The go version to use.  Example: '1.20.x'"
+        required: false
+        type: string
+        default: '^1.20.x'
+      go-version-latest:
+        description: "Will always use the latest version of go available."
+        required: false
+        type: boolean
+        default: true
+      go-generate-skip:
+        description: "Skip running go generate if needed."
+        required: false
+        type: boolean
+        default: false
+      go-generate-deps:
+        description: "The line sparated list of go generate dependencies to install via `go install` prior to running `go generate`."
+        required: false
+        type: string
+        default: ''
+      working-directory:
+        description: 'The working directory for this project.'
+        required: false
+        type: string
+        default: .
+
+
+      # Alphabetize the sections & prefix the names of the sections to the
+      # parameters associated, so maintenance and discovery is easier.
+
+      # Build focused
+      build-skip:
+        description: 'Skip building the program.'
+        required: false
+        type: boolean
+        default: false
+
+      # Goreportcard focused
+      goreportcard-skip:
+        description: 'Skip running the goreportcard update.'
+        required: false
+        type: boolean
+        default: false
+
+      # Lint focused
+      lint-skip:
+        description: 'Skip running the lint check.'
+        required: false
+        type: boolean
+        default: false
+      lint-timeout:
+        description: 'The timeout to pass on to the linter.'
+        required: false
+        type: string
+        default: '5m'
+      lint-version:
+        description: 'The working directory for this project.'
+        required: false
+        type: string
+        default: 'latest'
+
+
+      # License focused
+      license-skip:
+        description: 'Skip building the license check.'
+        required: false
+        type: boolean
+        default: false
+
+
+      # Release focused
+      release-arch-amd64:
+        description: "Set to enable amd64 binary and dockers to be built."
+        required: false
+        type: boolean
+        default: true
+      release-arch-arm64:
+        description: "Set to enable arm64 binary and dockers to be built."
+        required: false
+        type: boolean
+        default: true
+      release-binary-name:
+        description: "If the project needs a custom name, use set it here."
+        required: false
+        type: string
+        default: ""
+
+      release-custom-file:
+        description: "If the project needs a custom release file, use that instead."
+        required: false
+        type: boolean
+        default: false
+
+      release-docker:
+        description: "If set to true, release a container to gocr as well."
+        required: false
+        type: boolean
+        default: false
+
+      release-docker-file:
+        description: "Set to the docker file and path if you don't want the default of `Dockerfile` in the project root."
+        required: false
+        type: string
+        default: 'Dockerfile'
+
+      release-docker-latest:
+        description: "If set to true, release this container as the latest."
+        required: false
+        type: boolean
+        default: false
+
+      release-docker-major:
+        description: "If set to true, release this container as the latest for the major version."
+        required: false
+        type: boolean
+        default: false
+
+      release-docker-minor:
+        description: "If set to true, release this container as the latest for the minor version."
+        required: false
+        type: boolean
+        default: false
+
+      release-main-package:
+        description: "Path to main.go file or main package."
+        required: false
+        type: string
+        default: '.'
+
+      release-project-name:
+        description: "The project name / binary name to use if not the repo name."
+        required: false
+        type: string
+        default: ''
+
+      release-skip-publish:
+        description: "Set to --skip-publish to skip publishing."
+        required: false
+        type: string
+        default: ''
+
+      release-type:
+        description: "The type of artifact to expect and release. [ library | program ]."
+        required: true
+        type: string
+
+
+      # Copyright focused
+      copyright-skip:
+        description: 'Skip validating that all files have copyright and licensing information.'
+        required: false
+        type: boolean
+        default: false
+
+
+      # Style/code format focused
+      style-skip:
+        description: 'Skip building the gofmt check.'
+        required: false
+        type: boolean
+        default: false
+
+
+      # Unit test focused
+      tests-skip:
+        description: 'Skip running the unit tests.'
+        required: false
+        type: boolean
+        default: false
+      tests-race:
+        description: 'If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done.'
+        required: false
+        type: boolean
+        default: true
+
+
+jobs:
+
+
+  build_program:
+    runs-on: [ ubuntu-latest ]
+    if: inputs.build-skip == false
+    name: Build Go Program
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: Setup go version
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          check-latest: ${{ inputs.go-version-latest }}
+
+      - name: Fetch go:generate dependencies
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          deps=$(echo ${{ inputs.go-generate-deps }} | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+          for dep in $deps
+          do
+            go install ${dep}
+          done
+
+      - name: Run go generate
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          go generate ./...
+
+      # Run build of the application
+      - name: Run build
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          go build    ./...
+
+
+  unit_test:
+    runs-on: [ ubuntu-latest ]
+    name: Go Unit Tests
+    if: inputs.tests-skip == false
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup go version
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          check-latest: ${{ inputs.go-version-latest }}
+
+      - name: Fetch go:generate dependencies
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          deps=$(echo ${{ inputs.go-generate-deps }} | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+          for dep in $deps
+          do
+            go install ${dep}
+          done
+
+      - name: Run go generate
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          go generate ./...
+
+      # Run testing on the code
+      - name: Run testing
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          go test -v ${{ inputs.tests-race && '-race' || '' }} -coverprofile=coverage.txt ./...
+          go test ${{ inputs.tests-race && '-race' || '' }} -json > report.json ./...
+
+      # upload report as artifact
+      - name: Archive unit tests report
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: report
+          path: ${{ inputs.working-directory }}/report.json
+
+      # upload coverage as artifact
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: coverage
+          path: ${{ inputs.working-directory }}/coverage.txt
+
+      - name: Send results to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ${{ inputs.working-directory }}
+          flags:     unittests
+
+
+  docker_check:
+    if: inputs.release-docker
+    runs-on: [ ubuntu-latest ]
+    outputs:
+      docker_file_present: ${{ steps.build.outputs.docker_file_present }}
+    name: Check Docker Build
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: Build image
+        id: build
+        run: |
+          # Check for a dockerfile
+          if [ -f ${{ inputs.docker-directory }}/${{ inputs.docker-file}} ]; then
+            echo "docker_file_present=true" >> $GITHUB_ENV
+
+            d=`dirname ${{ inputs.release-docker-file }}`
+            f=`basename ${{ inputs.release-docker-file }}`
+
+            docker build ${d} -f ${f} \
+              --tag ghcr.io/${{ github.repository }}:latest \
+              --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+              --label "org.opencontainers.image.revision=${{ github.sha }}"
+          fi
+
+  goreportcard:
+    runs-on: [ ubuntu-latest ]
+    if: |
+      inputs.goreportcard-skip == false &&
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Go report card
+        uses: creekorful/goreportcard-action@v1.0
+
+
+  style:
+    runs-on: [ ubuntu-latest ]
+    name: Go format check
+    if: inputs.style-skip == false
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: Setup go version
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          check-latest: ${{ inputs.go-version-latest }}
+
+      - name: Run gofmt
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gofmt -d $(find . -path ./vendor -prune -o -name '*.go' -print) > fmt.patch
+          # Error check & fail if any format mismatches are detected.
+          if [ $(wc fmt.patch | awk '{print $1}') -ne 0 ]; then
+            cat fmt.patch;
+            exit 1;
+          fi
+
+      - name: Archive code style results
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: fmt
+          path: ${{ inputs.working-directory }}/fmt.patch
+          retention-days: 10
+
+
+
+  golint:
+    runs-on: [ ubuntu-latest ]
+    name: Go Lint
+    if: inputs.lint-skip == false
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: Setup Go
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          check-latest: ${{ inputs.go-version-latest }}
+
+      - name: Fetch go:generate dependencies
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          deps=$(echo ${{ inputs.go-generate-deps }} | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+          for dep in $deps
+          do
+            go install ${dep}
+          done
+
+      - name: Run go generate
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          go generate ./...
+
+      # working-directory and only-new-issues aren't compatible so run for entire repo each time.
+      - name: Lint Entire Repo
+        if: github.event_name != 'pull_request'
+        uses: golangci/golangci-lint-action@08e2f20817b15149a52b5b3ebe7de50aff2ba8c5 # v3.4.0
+        with:
+          version: ${{ inputs.lint-version }}
+          working-directory: ${{ inputs.working-directory }}
+          args: --timeout ${{ inputs.lint-timeout }}
+          skip-pkg-cache: true
+          skip-build-cache: true
+
+
+  copyright:
+    runs-on: [ ubuntu-latest ]
+    if: inputs.copyright-skip == false
+    steps: 
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@e7a435374d26d54b324fa6699d8eafb076340dfd # v1.2.0
+
+
+  license:
+    name: License Checker
+    runs-on: [ ubuntu-latest ]
+    if: inputs.license-skip == false
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+      - name: Setup Go
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          check-latest: ${{ inputs.go-version-latest }}
+
+      # setup ruby environment before running jonabc/setup-licensed
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+        with:
+          ruby-version: ruby
+
+      - name: Setup licensed
+        uses: jonabc/setup-licensed@d6b3a6f7058c2b40c06d205e13e15c2418977566 # v1.1.4
+        with:
+         version: 4.x
+         github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch Org Approved Licenses & merge to local
+        shell: bash
+        run: |
+          if [ -f .licensed.yml ]; then
+            echo "Please submit these licenses to the shared list..."
+            mv .licensed.yml .licensed_local.yml
+          fi
+          if [ -f .licensed.json ]; then
+            echo "JSON is not supported.  Please use .licensed.yml or submit a patch."
+          fi
+          if [ ! -f .licensed_local.yml ]; then
+            touch .licensed_local.yml
+          fi
+          curl -L -s -f \
+            --max-time    10 \
+            --retry       5 \
+            --retry-delay 1 \
+            -H 'Accept: application/vnd.github.v3.raw' \
+            https://api.github.com/repos/xmidt-org/.github/contents/licensing/org-approved.yml?ref=main \
+            -o .licensed_common.yml
+          yq eval-all '. as $item ireduce ({}; . *+  $item)' .licensed_local.yml .licensed_common.yml > .licensed.yml
+
+      - name: Fetch all dependencies
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          go get ./...
+
+      - name: Examine the licenses
+        run: |
+          licensed cache
+
+      - name: Validate compliance
+        run: |
+          licensed status -f yaml > licensing.yml || true
+          yq eval 'del(.apps[].sources[].dependencies[] | select(.allowed == "true") )' licensing.yml > disallowed.yml
+          licensed status
+
+      - name: Archive license results
+        if: always()
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: licensing
+          path: |
+            ${{ inputs.working-directory }}/licensing.yml
+            ${{ inputs.working-directory }}/disallowed.yml
+          retention-days: 30
+
+  release:
+    permissions:
+      contents: write
+      packages: write
+
+    name: Release
+    needs: [ build_program, unit_test, style, golint, license, copyright ]
+    if: |
+      always() &&
+      inputs.release-skip        == false     &&
+      startsWith(github.ref, 'refs/tags/')    &&
+      needs.build_program.result != 'failure' &&
+      needs.unit_test.result     != 'failure' &&
+      needs.style.result         != 'failure' &&
+      needs.golint.result        != 'failure' &&
+      needs.copyright.result     != 'failure' &&
+      needs.license.result       != 'failure'
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags for TagBody, TagSubject and TagContents
+        run: git fetch --force --tags
+
+      - name: Setup go version
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          check-latest: ${{ inputs.go-version-latest }}
+
+      - name: Fetch go:generate dependencies
+        if: inputs.go-generate-skip == false
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          deps=$(echo ${{ inputs.go-generate-deps }} | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+          for dep in $deps
+          do
+            go install ${dep}
+          done
+
+      - name: Generate common rules to the .goreleaser.yml file
+        if: inputs.release-custom-file == false
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          project_name=${{ inputs.release-project-name }}
+          if [[ $project_name == "" ]]; then
+            project_name=$(echo ${{ github.repository }} | sed 's:.*/::')
+          fi
+
+          echo "---" > .goreleaser.yml
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "project_name: ${project_name}"
+          gecho ""
+          if [[ ${{ inputs.go-generate-skip }} == "false" ]]; then
+            gecho "before:"
+            gecho "  hooks:"
+            gecho "    - go generate ./..."
+            gecho ""
+          fi
+          gecho ""
+          gecho "changelog:"
+          gecho "  use: github"
+          gecho "  sort: asc"
+          gecho "  filters:"
+          gecho "    exclude:"
+          gecho "    - '^test:'"
+          gecho "    - '^chore'"
+          gecho "    - 'merge conflict'"
+          gecho "    - Merge pull request"
+          gecho "    - Merge remote-tracking branch"
+          gecho "    - Merge branch"
+          gecho "    - go mod tidy"
+          gecho "  groups:"
+          gecho "    - title: 'Dependency Updates'"
+          gecho "      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'"
+          gecho "      order: 300"
+          gecho "    - title: 'New Features'"
+          gecho "      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'"
+          gecho "      order: 100"
+          gecho "    - title: 'Bug Fixes'"
+          gecho "      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'"
+          gecho "      order: 200"
+          gecho "    - title: 'Documentation Updates'"
+          gecho "      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$"
+          gecho "      order: 400"
+          gecho "    - title: Other Work"
+          gecho "      order: 9999"
+          gecho ""
+
+      - name: Generate the library .goreleaser.yml file
+        if: |
+          inputs.release-custom-file == false &&
+          inputs.release-type == 'library'
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+
+          gecho "builds:"
+          gecho "  - skip: true"
+          gecho ""
+
+      - name: Generate the program .goreleaser.yml file
+        if: |
+          inputs.release-custom-file == false &&
+          inputs.release-type == 'program'
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "builds:"
+          gecho "  -"
+          gecho "    main:  '${{ inputs.release-main-package }}'"
+          if [[ "${{ inputs.release-binary-name }}" != "" ]]; then
+          gecho "    binary: '${{ inputs.release-binary-name }}'"
+          fi
+          gecho "    env:"
+          gecho "      - CGO_ENABLED=0"
+          gecho "    goos:"
+          gecho "      - linux"
+          gecho "    goarch:"
+          if [[ "${{ inputs.release-arch-amd64 }}" == "true" ]]; then
+          gecho "      - amd64"
+          fi
+          if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+          gecho "      - arm64"
+          fi
+          gecho "    mod_timestamp: \"{{ .CommitTimestamp }}\""
+          gecho ""
+          gecho "archives:"
+          gecho "  - format: tar.gz"
+          gecho "    wrap_in_directory: true"
+          gecho "    format_overrides:"
+          gecho "      - goos: windows"
+          gecho "        format: zip"
+          gecho "    name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'"
+          gecho ""
+          gecho "checksum:"
+          gecho "  name_template: '{{.ProjectName}}-{{.Version}}-checksums.txt'"
+          gecho "  algorithm: sha512"
+          gecho ""
+          gecho "dockers:"
+
+      - name: Generate the amd64 docker .goreleaser.yml section
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-docker      == true      &&
+          inputs.release-arch-amd64  == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "  - use: buildx"
+          gecho "    goos: linux"
+          gecho "    goarch: amd64"
+          gecho "    build_flag_templates:"
+          gecho "      - \"--platform=linux/amd64\""
+          gecho "      - \"--label=org.opencontainers.image.created={{.Date}}\""
+          gecho "      - \"--label=org.opencontainers.image.url=https://github.com/${{ github.repository }}\""
+          gecho "      - \"--label=org.opencontainers.image.title={{.ProjectName}}\""
+          gecho "      - \"--label=org.opencontainers.image.revision={{.FullCommit}}\""
+          gecho "      - \"--label=org.opencontainers.image.source=https://github.com/${{ github.repository }}\""
+          gecho "      - \"--label=org.opencontainers.image.version={{.Version}}\""
+          gecho "    image_templates:"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
+
+          if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-amd64"
+          fi
+
+          if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-amd64"
+          fi
+
+          if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
+          gecho "      - ghcr.io/${{ github.repository }}:latest-amd64"
+          fi
+
+          if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
+          gecho "    skip_push: true"
+          fi
+
+          gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
+          gecho ""
+
+      - name: Generate the arm64 docker .goreleaser.yml section
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-docker      == true      &&
+          inputs.release-arch-arm64  == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "  - use: buildx"
+          gecho "    goos: linux"
+          gecho "    goarch: arm64"
+          gecho "    build_flag_templates:"
+          gecho "      - \"--platform=linux/arm64\""
+          gecho "      - \"--label=org.opencontainers.image.created={{.Date}}\""
+          gecho "      - \"--label=org.opencontainers.image.url=https://github.com/${{ github.repository }}\""
+          gecho "      - \"--label=org.opencontainers.image.source=https://github.com/${{ github.repository }}\""
+          gecho "      - \"--label=org.opencontainers.image.title={{.ProjectName}}\""
+          gecho "      - \"--label=org.opencontainers.image.revision={{.FullCommit}}\""
+          gecho "      - \"--label=org.opencontainers.image.version={{.Version}}\""
+          gecho "    image_templates:"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
+
+          if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-arm64"
+          fi
+
+          if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-arm64"
+          fi
+
+          if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
+          gecho "      - ghcr.io/${{ github.repository }}:latest-arm64"
+          fi
+
+          if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
+          gecho "    skip_push: true"
+          fi
+
+          gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
+          gecho ""
+
+      - name: Show the .goreleaser.yml file
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          cat .goreleaser.yml
+
+      - name: Validate release-type
+        if: |
+          inputs.release-type != 'library' &&
+          inputs.release-type != 'program'
+        shell: bash
+        run: |
+          echo "The release-type input must be either 'library' or 'program'."
+          echo "The release-type provided is: '${{ inputs.release-type }}'"
+          exit 1
+
+      - name: Ensure LICENSE and README.md are present
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.working-directory   != '.'
+        shell: bash
+        run: |
+          if [[ -f LICENSE ]]; then
+            cp -n LICENSE ${{ inputs.working-directory }}/.
+          fi
+          if [[ -e LICENSES ]]; then
+            cp -a -n LICENSES ${{ inputs.working-directory }}/.
+          fi
+          if [[ -f README.md ]]; then
+            cp -n README.md ${{ inputs.working-directory }}/.
+          fi
+
+      - name: Log in to GitHub Container Registry
+        if: |
+          inputs.release-docker == true
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate the Release
+        if: success() && startsWith(github.ref, 'refs/tags/')
+        uses: goreleaser/goreleaser-action@f82d6c1c344bcacabba2c841718984797f664a6b # v4.2.0
+        with:
+          distribution: goreleaser
+          workdir:      ${{ inputs.working-directory }}
+          version:      latest
+          args:         release --clean --skip-validate ${{ inputs.release-skip-publish }}
+        env:
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
+          GITHUB_TOKEN:           ${{ secrets.GITHUB_TOKEN }}
+
+  all_passed:
+    needs: [ build_program, unit_test, style, golint, license, copyright, release ]
+    if: always()
+    name: All checks passed check.
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Fail unless required checks pass
+        if: |
+          needs.build_program.result    == 'failure' ||
+          needs.unit_test.result        == 'failure' ||
+          needs.style.result            == 'failure' ||
+          needs.golint.result           == 'failure' ||
+          needs.license.result          == 'failure' ||
+          needs.copyright.result        == 'failure' ||
+          needs.release.result          == 'failure'
+        run: exit 1
+      - run: 'echo "✅ All required jobs have passed!"'

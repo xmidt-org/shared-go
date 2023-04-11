@@ -701,7 +701,7 @@ jobs:
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
-          extras= '${{ inputs.release-docker-extras }}'
+          extras='${{ inputs.release-docker-extras }}'
           if [[ ! -z "${extras}" ]]; then
             gecho "    extra_files:"
             extras=$(echo "${extras}" | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
@@ -753,7 +753,7 @@ jobs:
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
-          extras= '${{ inputs.release-docker-extras }}'
+          extras='${{ inputs.release-docker-extras }}'
           if [[ ! -z "${extras}" ]]; then
             gecho "    extra_files:"
             extras=$(echo "${extras}" | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")

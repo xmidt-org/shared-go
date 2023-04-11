@@ -54,7 +54,7 @@ jobs:
           fi
 
           cat ${prefix}_start.tmp     >  README.md
-          echo "${doc}"               >> README.md
+          echo "${DOCUMENT}"          >> README.md
           cat ${prefix}_end.tmp       >> README.md
 
           rm ${prefix}_start.tmp

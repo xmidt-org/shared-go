@@ -24,7 +24,6 @@ jobs:
       lint-skip:            true
       license-skip:         true
       copyright-skip:       true
-      sonarcloud-skip:      true
       style-skip:           true
       tests-skip:           true
       working-directory:    library

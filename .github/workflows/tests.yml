@@ -31,7 +31,6 @@ jobs:
       startsWith(github.ref, 'refs/tags/') == false
     with:
       license-skip:         true
-      sonarcloud-skip:      true
       release-skip-publish: --skip-publish
       working-directory:    command
       release-main-package: ./cmd/foo
@@ -49,7 +48,6 @@ jobs:
       build-skip:           true
       lint-skip:            true
       license-skip:         true
-      #sonarcloud-skip:      true
       style-skip:           true
       #tests-skip:           true
       release-skip-publish: --skip-publish
@@ -71,7 +69,6 @@ jobs:
       startsWith(github.ref, 'refs/tags/') == false
     with:
       license-skip:         true
-      sonarcloud-skip:      true
       release-skip-publish: --skip-publish
       working-directory:    program
       release-type:         program
@@ -87,7 +84,6 @@ jobs:
       build-skip:            true
       lint-skip:             true
       license-skip:          true
-      #sonarcloud-skip:       true
       style-skip:            true
       #tests-skip:            true
       release-skip-publish:  --skip-publish
@@ -107,7 +103,6 @@ jobs:
       startsWith(github.ref, 'refs/tags/') == false
     with:
       license-skip:         true
-      sonarcloud-skip:      true
       release-skip-publish: --skip-publish
       working-directory:    library
       release-type:         library
@@ -123,7 +118,6 @@ jobs:
       build-skip:           true
       lint-skip:            true
       license-skip:         true
-      #sonarcloud-skip:      true
       style-skip:           true
       #tests-skip:           true
       release-skip-publish: --skip-publish

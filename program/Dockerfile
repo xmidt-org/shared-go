@@ -3,3 +3,4 @@
 FROM scratch
 ENTRYPOINT ["/programtest"]
 COPY programtest /
+COPY main.go /

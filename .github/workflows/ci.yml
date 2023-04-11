@@ -129,6 +129,11 @@ on:
         type: boolean
         default: false
 
+      release-docker-extras:
+        description: "Provides a way to set the `extra_files` field with the list of files/dirs to make available."
+        required: false
+        type: string
+
       release-docker-file:
         description: "Set to the docker file and path if you don't want the default of `Dockerfile` in the project root."
         required: false
@@ -696,6 +701,15 @@ jobs:
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
+          extras='${{ inputs.release-docker-extras }}'
+          if [[ ! -z "${extras}" ]]; then
+            gecho "    extra_files:"
+            extras=$(echo "${extras}" | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+            for extra in $extras
+            do
+              gecho "      - ${extra}"
+            done
+          fi
           gecho ""
 
       - name: Generate the arm64 docker .goreleaser.yml section
@@ -739,6 +753,15 @@ jobs:
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
+          extras='${{ inputs.release-docker-extras }}'
+          if [[ ! -z "${extras}" ]]; then
+            gecho "    extra_files:"
+            extras=$(echo "${extras}" | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+            for extra in $extras
+            do
+              gecho "      - ${extra}"
+            done
+          fi
           gecho ""
 
       - name: Show the .goreleaser.yml file

@@ -3,7 +3,7 @@
 
 name: "Update docs"
 on:
-  pull_request:
+  push:
     branches:
       - 'main'
     paths:
@@ -45,12 +45,12 @@ jobs:
 
           # store the part before if start
           if [ -n "${start_line}" ]; then
-              sed -e "$((${start_line}+1)),\$d" README.md > ${prefix}_start.tmp
+              sed -e "$((${start_line})),\$d" README.md > ${prefix}_start.tmp
           fi
 
           # store the part after if end
           if [ -n "${end_line}" ]; then
-              sed -e "1,$((${end_line}-1))d" README.md > ${prefix}_end.tmp
+              sed -e "1,$((${end_line}))d" README.md > ${prefix}_end.tmp
           fi
 
           cat ${prefix}_start.tmp     >  README.md

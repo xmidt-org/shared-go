@@ -116,7 +116,7 @@ This workflow does the following things automatically:
 ## Golang CI Workflow Sample
 
 ```yaml
-# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+ SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
  SPDX-License-Identifier: Apache-2.0
 ---
 name: 'CI'
@@ -156,20 +156,24 @@ jobs:
 | 14 |  | string | release-binary-name |  | If the project needs a custom name, use set it here. |
 | 15 |  | boolean | release-custom-file | false | If the project needs a custom release file, use that instead. |
 | 16 |  | boolean | release-docker | false | If set to true, release a container to gocr as well. |
-| 17 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of `Dockerfile` in the project root. |
-| 18 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
-| 19 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for the major version. |
-| 20 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
-| 21 |  | string | release-main-package | . | Path to main.go file or main package. |
-| 22 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
-| 23 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
-| 24 | ✅ | string | release-type |  | The type of artifact to expect and release. [ library | program ]. |
-| 25 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
-| 26 |  | boolean | style-skip | false | Skip building the gofmt check. |
-| 27 |  | boolean | tests-skip | false | Skip running the unit tests. |
-| 28 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
+| 17 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of files/dirs to make available. |
+| 18 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of `Dockerfile` in the project root. |
+| 19 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
+| 20 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for the major version. |
+| 21 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
+| 22 |  | string | release-main-package | . | Path to main.go file or main package. |
+| 23 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
+| 24 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
+| 25 | ✅ | string | release-type |  | The type of artifact to expect and release. [ library | program ]. |
+| 26 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
+| 27 |  | boolean | style-skip | false | Skip building the gofmt check. |
+| 28 |  | boolean | tests-skip | false | Skip running the unit tests. |
+| 29 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
+
+
 
 <!-- @overwrite-anchor=end -->
+
 
 ## Workflow Development
 

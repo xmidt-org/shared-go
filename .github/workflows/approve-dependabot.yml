@@ -19,6 +19,7 @@ name: 'Dependabot auto approvals.'
 
 on:
   workflow_call:
+    inputs:
 
 jobs:
   dependabot:

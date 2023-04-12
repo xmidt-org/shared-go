@@ -1,37 +1,17 @@
 # SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
 # SPDX-License-Identifier: Apache-2.0
-
-# @example=## Project Tracking
-## SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
-## SPDX-License-Identifier: Apache-2.0
-#---
-#name: 'Project Tracking'
-#
-#on:
-#  issues:
-#    types:
-#      - opened
-#  pull_request:
-#    types:
-#      - opened
-#
-#jobs:
-#  project:
-#    uses: xmidt-org/shared-go/.github/workflows/proj.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
-#    secrets: inherit
 ---
-name: 'Add new issues to team project'
+name: 'Project Tracking'
 
 on:
-  workflow_call:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
 
 jobs:
-  add-to-project:
-    name: Add issue to project
-    runs-on: ubuntu-latest
-    steps:
-      # Target the team project board.
-      - uses: actions/add-to-project@31b3f3ccdc584546fc445612dec3f38ff5edb41c # v0.5.0
-        with:
-          project-url: https://github.com/orgs/comcast-cl/projects/3
-          github-token: ${{ secrets.PROJECT_ISSUE_CREATION_TOKEN }}
+  dependabot:
+    uses: ./.github/workflows/proj.yml
+    secrets: inherit

@@ -12,7 +12,7 @@
 #
 #jobs:
 #  dependabot:
-#    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
+#    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6a0bec30f42c318c0c1d06705f3f60911ed7c610 # v3.2.0
 #    secrets: inherit
 ---
 name: 'Approve Dependabot Workflow'

@@ -19,7 +19,6 @@ name: 'Approve Dependabot Workflow'
 
 on:
   workflow_call:
-    inputs:
 
 jobs:
   dependabot:

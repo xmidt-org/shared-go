@@ -20,7 +20,7 @@
 #    uses: xmidt-org/shared-go/.github/workflows/proj.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
 #    secrets: inherit
 ---
-name: 'Add new issues to team project'
+name: 'Project Tracking Workflow'
 
 on:
   workflow_call:

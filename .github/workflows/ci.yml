@@ -22,7 +22,7 @@
 #    with:
 #      release-type: library
 #    secrets: inherit
-name: CI
+name: 'CI Workflow'
 
 on:
   workflow_call:

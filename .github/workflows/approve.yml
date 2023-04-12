@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+---
+name: 'Approve Dependabot'
+
+on:
+  pull_request_target:
+
+jobs:
+  dependabot:
+    uses: ./.github/workflows/approve-dependabot.yml
+    secrets: inherit

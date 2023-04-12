@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+---
+name: 'Project Tracking'
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  dependabot:
+    uses: ./.github/workflows/proj.yml
+    secrets: inherit

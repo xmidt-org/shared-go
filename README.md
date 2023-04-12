@@ -111,32 +111,9 @@ This workflow does the following things automatically:
 
 # 🔰 Reusable Workflows 🔰
 
-* [1: Approve Dependabot Workflow](#1-approve-dependabot-workflow) ( [📄](.github/workflows/approve-dependabot.yml) )
-* [2: CI Workflow](#2-ci-workflow) ( [📄](.github/workflows/ci.yml) )
-* [3: Project Tracking Workflow](#3-project-tracking-workflow) ( [📄](.github/workflows/proj.yml) )
+* [1: CI Workflow](#1-ci-workflow) ( [📄](.github/workflows/ci.yml) )
 
-## 1: Approve Dependabot Workflow
-## Dependabot Approver Sample
-
-```yaml
-# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
-# SPDX-License-Identifier: Apache-2.0
----
-name: 'Approve Dependabot'
-
-on:
-  pull_request_target:
-
-jobs:
-  dependabot:
-    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
-    secrets: inherit
-```
-
-
-
-
-## 2: CI Workflow
+## 1: CI Workflow
 ## Golang CI Workflow Sample
 
 ```yaml
@@ -154,7 +131,7 @@ on:
 
 jobs:
   add-to-project:
-    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
+    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6a0bec30f42c318c0c1d06705f3f60911ed7c610 # v3.2.0
     with:
       release-type: library
     secrets: inherit
@@ -166,7 +143,7 @@ jobs:
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | 1 |  | string | go-version | ^1.20.x | The go version to use.  Example: '1.20.x' |
 | 2 |  | boolean | go-version-latest | true | Will always use the latest version of go available. |
-| 3 |  | boolean | go-generate-skip | false | Skip running go generate if needed. |
+| 3 |  | boolean | go-generate-skip | true | Skip running go generate if needed. |
 | 4 |  | string | go-generate-deps |  | The line sparated list of go generate dependencies to install via `go install` prior to running `go generate`. |
 | 5 |  | string | working-directory | . | The working directory for this project. |
 | 6 |  | boolean | build-skip | false | Skip building the program. |
@@ -196,33 +173,8 @@ jobs:
 
 
 
-## 3: Project Tracking Workflow
-## Project Tracking
-
-```yaml
-# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
-# SPDX-License-Identifier: Apache-2.0
----
-name: 'Project Tracking'
-
-on:
-  issues:
-    types:
-      - opened
-  pull_request:
-    types:
-      - opened
-
-jobs:
-  project:
-    uses: xmidt-org/shared-go/.github/workflows/proj.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
-    secrets: inherit
-```
-
-
-
-
 <!-- @overwrite-anchor=end -->
+
 
 
 

@@ -14,13 +14,84 @@ test the workflows before they are put into production as well as provide a
 way for dependabot to do much of the boring stuff for us (like keeping
 dependencies up to date).  And to test everything.
 
+## Maintaining a Repository Using `shared-go`
+
+### Dependabot & Automation
+
+To be efficient, dependabot really should be setup for each repo and allowed to
+commit updates.  Protect robot's rights; never let a human do a robot's work.
+
+Do ensure that branch protection rules requiring a `pull request` are in place
+and require the `All checks passed check.` status to succeed to protect against
+broken code from automatically being merged.
+
+This does not prevent maintainers from pushing code as they deem reasonable, but
+do think about using the workflow & a PR to verify code changes.  It is reasonable
+to over-ride the requirement for an approval to merge your PR.  "You break it,
+you fix it" rules are in effect.
+
+### Clean Code
+
+Strive to run with all the checking on in the workflow.  Despite being annoying
+or tedious at times, the value is more consistent code across projects.  "Running
+clean" means there are fewer exceptions to trip us up.
+
+### Multiple Architectures
+
+Expect to generate output for multiple architectures (x86 and arm64 today, others
+in the future), so make code and containers work everywhere when possible.
+
+### Changelog
+
+No need to update CHANGELOG.md files anymore, as that information is automatically
+gathered by gorelease for us based on commit messages.  The CHANGELOG.md files
+will be removed so the source of truth is more clear soon.
+
+### Commit Messages
+
+The following comment "prefixes" will automatically categorize your work in the
+release notes, so please use them.
+
+- `feat(deps):` or `fix(deps):` will group the commit into **Dependency Updates**
+- `feat:` or `feat([:word:]):` (where `[:word:]` is any word except `deps`) will group the commit into **New Features**
+- `fix:` or `fix([:word:]):` (where `[:word:]` is any word except `deps`) will group the commit into **Bug Fixes**
+- `doc:` or `doc([:word:]):` (where `[:word:]` is any word) will group the commit into **Documentation Updates**
+- The following prefixes cause the commit to be omitted from the release notes.
+   - `chore:`
+   - `test:`
+   - `merge conflict` (can happen anywhere in the commit message)
+   - `Merge pull request` (can happen anywhere in the commit message)
+   - `Merge remote-tracking branch` (can happen anywhere in the commit message)
+   - `Merge branch` (can happen anywhere in the commit message)
+   - `go mod tidy` (can happen anywhere in the commit message)
+- Everything else will show up as **Other Work**
+
+### Releasing
+
+Releases are as simple as creating and pushing a semver tag in the following format:
+
+```
+v[0-9]+.[0-9]+.[0-9]+
+```
+
+The ci workflow will take care of the rest for you.
+
+Example:
+```bash
+git pull --tags
+git tag v1.0.1
+git push --tags
+```
+
+Tags should be **forever** but releases can be removed if needed.
+
 ## Workflow Usage
 
 For your go project you are going to want at least 2 workflows:
 
 - A ci workflow.
-- A dependabot approving workflow. (See: [shared-dependabot-approver](https://github.com/comcast-cl/shared-dependabot-approver) for details.)
-- (optional) A project tracking workflow. (See: [shared-project](https://github.com/comcast-cl/shared-project) for details.)
+- A dependabot approving workflow.
+- (optional) A project tracking workflow.
 
 This workflow does the following things automatically:
 
@@ -28,7 +99,7 @@ This workflow does the following things automatically:
 - runs all the unit tests (may be disabled)
 - runs gofmt style checking (may be disabled)
 - runs golangci-lint checking (may be disabled)
-- checks the copyright headers using the [shared-copyright](https://github.com/comcast-cl/shared-copyright) workflow (may be disabled)
+- checks the copyright headers (may be disabled)
 - dependency license checking (may be disabled)
 - report results to sonarcloud (may be disabled)
 - releasing via [gorelease](https://github.com/gorelease/gorelease) (may be disabled)
@@ -98,13 +169,7 @@ jobs:
 | 27 |  | boolean | tests-skip | false | Skip running the unit tests. |
 | 28 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
 
-
-
 <!-- @overwrite-anchor=end -->
-
-
-
-
 
 ## Workflow Development
 

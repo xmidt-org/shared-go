@@ -111,13 +111,37 @@ This workflow does the following things automatically:
 
 # 🔰 Reusable Workflows 🔰
 
+* [1: Approve Dependabot Workflow](#1-approve-dependabot-workflow) ( [📄](.github/workflows/approve-dependabot.yml) )
+* [2: CI Workflow](#2-ci-workflow) ( [📄](.github/workflows/ci.yml) )
+* [3: Project Tracking Workflow](#3-project-tracking-workflow) ( [📄](.github/workflows/proj.yml) )
 
-## 1: CI
+## 1: Approve Dependabot Workflow
+## Dependabot Approver Sample
+
+```yaml
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+---
+name: 'Approve Dependabot'
+
+on:
+  pull_request_target:
+
+jobs:
+  dependabot:
+    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
+    secrets: inherit
+```
+
+
+
+
+## 2: CI Workflow
 ## Golang CI Workflow Sample
 
 ```yaml
- SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
- SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
 ---
 name: 'CI'
 
@@ -172,7 +196,34 @@ jobs:
 
 
 
+## 3: Project Tracking Workflow
+## Project Tracking
+
+```yaml
+# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+---
+name: 'Project Tracking'
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  project:
+    uses: xmidt-org/shared-go/.github/workflows/proj.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
+    secrets: inherit
+```
+
+
+
+
 <!-- @overwrite-anchor=end -->
+
 
 
 ## Workflow Development

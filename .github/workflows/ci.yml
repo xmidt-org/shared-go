@@ -26,7 +26,6 @@ name: 'CI Workflow'
 
 on:
   workflow_call:
-    inputs:
 
       # General or common inputs.  These cross cut concerns generally and shouldn't
       # be included in the more targetted sections below.

@@ -44,7 +44,7 @@ on:
         description: "Skip running go generate if needed."
         required: false
         type: boolean
-        default: false
+        default: true
       go-generate-deps:
         description: "The line sparated list of go generate dependencies to install via `go install` prior to running `go generate`."
         required: false

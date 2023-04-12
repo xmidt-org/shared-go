@@ -25,7 +25,7 @@ jobs:
         id: documenter
         uses: gizumon/github-actions-documenter@1057007786b38916b5deef7ac0308a8647c37dc8 # v0.2.1
         with:
-          should-skip-generate-agenda: true
+          should-skip-generate-agenda: false
 
       - name: Update the file
         env:

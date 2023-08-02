@@ -807,10 +807,21 @@ jobs:
           gecho ""
 
       - name: Determine project license(s)
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-rpms        == true
         shell: bash
         run: |
-          found=`ls LICENSES/|sed 's|\.txt\>||'
-          echo "LICENSE='$found'" >> $GITHUB_ENV
+          echo "LICENSE=unknown" >> $GITHUB_ENV
+
+          tree
+
+          if [ -d LICENSES ]; then
+            found=`ls LICENSES/|sed 's|\.txt\>||'
+            echo "LICENSE='$found'" >> $GITHUB_ENV
+          fi
+
           if [[ "${{ inputs.license }}" != "" ]]; then
             echo "LICENSE='${{ inputs.license }}'" >> $GITHUB_ENV
           fi

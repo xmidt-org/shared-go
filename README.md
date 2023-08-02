@@ -111,32 +111,9 @@ This workflow does the following things automatically:
 
 # 🔰 Reusable Workflows 🔰
 
-* [1: Approve Dependabot Workflow](#1-approve-dependabot-workflow) ( [📄](.github/workflows/approve-dependabot.yml) )
-* [2: CI Workflow](#2-ci-workflow) ( [📄](.github/workflows/ci.yml) )
-* [3: Project Tracking Workflow](#3-project-tracking-workflow) ( [📄](.github/workflows/proj.yml) )
+* [1: CI Workflow](#1-ci-workflow) ( [📄](.github/workflows/ci.yml) )
 
-## 1: Approve Dependabot Workflow
-## Dependabot Approver Sample
-
-```yaml
-# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
-# SPDX-License-Identifier: Apache-2.0
----
-name: 'Approve Dependabot'
-
-on:
-  pull_request_target:
-
-jobs:
-  dependabot:
-    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
-    secrets: inherit
-```
-
-
-
-
-## 2: CI Workflow
+## 1: CI Workflow
 ## Golang CI Workflow Sample
 
 ```yaml
@@ -147,16 +124,20 @@ name: 'CI'
 
 on:
   push:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
   workflow_dispatch:
 
 jobs:
-  add-to-project:
-    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
+  ci:
+    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6a0bec30f42c318c0c1d06705f3f60911ed7c610 # v3.2.0
     with:
-      release-type: library
+      release-type: program    # or: library
     secrets: inherit
 ```
 
@@ -166,63 +147,43 @@ jobs:
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | 1 |  | string | go-version | ^1.20.x | The go version to use.  Example: '1.20.x' |
 | 2 |  | boolean | go-version-latest | true | Will always use the latest version of go available. |
-| 3 |  | boolean | go-generate-skip | false | Skip running go generate if needed. |
+| 3 |  | boolean | go-generate-skip | true | Skip running go generate if needed. |
 | 4 |  | string | go-generate-deps |  | The line sparated list of go generate dependencies to install via `go install` prior to running `go generate`. |
 | 5 |  | string | working-directory | . | The working directory for this project. |
-| 6 |  | boolean | build-skip | false | Skip building the program. |
-| 7 |  | boolean | goreportcard-skip | false | Skip running the goreportcard update. |
-| 8 |  | boolean | lint-skip | false | Skip running the lint check. |
-| 9 |  | string | lint-timeout | 5m | The timeout to pass on to the linter. |
-| 10 |  | string | lint-version | latest | The working directory for this project. |
-| 11 |  | boolean | license-skip | false | Skip building the license check. |
-| 12 |  | boolean | release-arch-amd64 | true | Set to enable amd64 binary and dockers to be built. |
-| 13 |  | boolean | release-arch-arm64 | true | Set to enable arm64 binary and dockers to be built. |
-| 14 |  | string | release-binary-name |  | If the project needs a custom name, use set it here. |
-| 15 |  | boolean | release-custom-file | false | If the project needs a custom release file, use that instead. |
-| 16 |  | boolean | release-docker | false | If set to true, release a container to gocr as well. |
-| 17 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of files/dirs to make available. |
-| 18 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of `Dockerfile` in the project root. |
-| 19 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
-| 20 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for the major version. |
-| 21 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
-| 22 |  | string | release-main-package | . | Path to main.go file or main package. |
-| 23 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
-| 24 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
-| 25 | ✅ | string | release-type |  | The type of artifact to expect and release. [ library | program ]. |
-| 26 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
-| 27 |  | boolean | style-skip | false | Skip building the gofmt check. |
-| 28 |  | boolean | tests-skip | false | Skip running the unit tests. |
-| 29 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
-
-
-
-## 3: Project Tracking Workflow
-## Project Tracking
-
-```yaml
-# SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
-# SPDX-License-Identifier: Apache-2.0
----
-name: 'Project Tracking'
-
-on:
-  issues:
-    types:
-      - opened
-  pull_request:
-    types:
-      - opened
-
-jobs:
-  project:
-    uses: xmidt-org/shared-go/.github/workflows/proj.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
-    secrets: inherit
-```
-
+| 6 |  | string | description | ${{ github.repository }} does something important. | What this project/package does. |
+| 7 |  | string | license |  | The license this project should use if it doesn't support REUSE/SPDX. |
+| 8 |  | boolean | build-skip | false | Skip building the program. |
+| 9 |  | boolean | goreportcard-skip | false | Skip running the goreportcard update. |
+| 10 |  | boolean | lint-skip | false | Skip running the lint check. |
+| 11 |  | string | lint-timeout | 5m | The timeout to pass on to the linter. |
+| 12 |  | string | lint-version | latest | The working directory for this project. |
+| 13 |  | boolean | license-skip | false | Skip building the license check. |
+| 14 |  | boolean | release-arch-amd64 | true | Set to enable amd64 binary and dockers to be built. |
+| 15 |  | boolean | release-arch-arm64 | true | Set to enable arm64 binary and dockers to be built. |
+| 16 |  | string | release-binary-name |  | If the project needs a custom name, use set it here. |
+| 17 |  | boolean | release-custom-file | false | If the project needs a custom release file, use that instead. |
+| 18 |  | boolean | release-docker | false | If set to true, release a container to gocr as well. |
+| 19 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of files/dirs to make available. |
+| 20 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of `Dockerfile` in the project root. |
+| 21 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
+| 22 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for the major version. |
+| 23 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
+| 24 |  | string | release-main-package | . | Path to main.go file or main package. |
+| 25 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
+| 26 |  | boolean | release-rpms | true | If set to true, release generic rpms as well. |
+| 27 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
+| 28 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
+| 29 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See goreleaser nfpm contents for examples. |
+| 30 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the program.  Otherwise root is assumed. |
+| 31 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
+| 32 |  | boolean | style-skip | false | Skip building the gofmt check. |
+| 33 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
+| 34 |  | boolean | tests-skip | false | Skip running the unit tests. |
 
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

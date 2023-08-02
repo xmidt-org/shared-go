@@ -4,7 +4,7 @@
 # Copied from github.com/goschtalt/.github
 # @example=## Golang CI Workflow Sample
 ## SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
-# SPDX-License-Identifier: Apache-2.0
+## SPDX-License-Identifier: Apache-2.0
 #---
 #name: 'CI'
 #
@@ -21,12 +21,12 @@
 #
 #jobs:
 #  ci:
-#    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6dd1fab69f841fbea827a053e21fa83ea94774d9 # v3.0.0
+#    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6a0bec30f42c318c0c1d06705f3f60911ed7c610 # v3.2.0
 #    with:
 #      release-type: program    # or: library
 #    secrets: inherit
 ---
-name: CI
+name: 'CI Workflow'
 
 on:
   workflow_call:
@@ -141,6 +141,11 @@ on:
         required: false
         type: boolean
         default: false
+
+      release-docker-extras:
+        description: "Provides a way to set the `extra_files` field with the list of files/dirs to make available."
+        required: false
+        type: string
 
       release-docker-file:
         description: "Set to the docker file and path if you don't want the default of `Dockerfile` in the project root."
@@ -466,7 +471,7 @@ jobs:
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
       - name: REUSE Compliance Check
-        uses: fsfe/reuse-action@e7a435374d26d54b324fa6699d8eafb076340dfd # v1.2.0
+        uses: fsfe/reuse-action@4f2804894b54004c8ed4b8a62b7c649e54a3aa4b # v2.0.0
 
 
   license:
@@ -563,7 +568,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout the code
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           fetch-depth: 0
 
@@ -738,6 +743,15 @@ jobs:
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
+          extras='${{ inputs.release-docker-extras }}'
+          if [[ ! -z "${extras}" ]]; then
+            gecho "    extra_files:"
+            extras=$(echo "${extras}" | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+            for extra in $extras
+            do
+              gecho "      - ${extra}"
+            done
+          fi
           gecho ""
 
       - name: Generate the arm64 docker .goreleaser.yml section
@@ -781,6 +795,15 @@ jobs:
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
+          extras='${{ inputs.release-docker-extras }}'
+          if [[ ! -z "${extras}" ]]; then
+            gecho "    extra_files:"
+            extras=$(echo "${extras}" | sed -e 's/[\r\n\t]/ /g' | tr "," "\n")
+            for extra in $extras
+            do
+              gecho "      - ${extra}"
+            done
+          fi
           gecho ""
 
       - name: Determine project license(s)

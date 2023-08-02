@@ -68,11 +68,13 @@ jobs:
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:
-      license-skip:         true
-      release-skip-publish: --skip-publish
-      working-directory:    program
-      release-type:         program
-      release-docker:       true
+      license-skip:          true
+      release-skip-publish:  --skip-publish
+      working-directory:     program
+      release-type:          program
+      release-docker:        true
+      release-docker-extras: |
+        main.go
     secrets: inherit
 
   program-tag:
@@ -80,20 +82,23 @@ jobs:
     if: |
       startsWith(github.ref, 'refs/tags/')
     with:
-      copyright-skip:        true
-      build-skip:            true
-      lint-skip:             true
-      license-skip:          true
-      style-skip:            true
-      #tests-skip:            true
-      release-skip-publish:  --skip-publish
-      release-binary-name:   programtest
-      working-directory:     program
-      release-type:          program
-      release-docker:        true
-      release-docker-latest: true
-      release-docker-major:  true
-      release-docker-minor:  true
+      copyright-skip:         true
+      build-skip:             true
+      lint-skip:              true
+      license-skip:           true
+      style-skip:             true
+      #tests-skip:             true
+      release-skip-publish:   --skip-publish
+      release-binary-name:    programtest
+      working-directory:      program
+      release-type:           program
+      release-docker:         true
+      release-docker-latest:  true
+      release-docker-major:   true
+      release-docker-minor:   true
+      release-docker-extras:  |
+        main.go
+        go.mod
     secrets: inherit
 
 
@@ -167,7 +172,7 @@ jobs:
       needs.slow-things-library.result     != 'failure'
     steps:
       - name: Checkout the code
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           token: ${{ secrets.PUSH_TAG_TOKEN }}
 

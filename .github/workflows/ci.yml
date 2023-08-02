@@ -2,7 +2,6 @@
 # SPDX-FileCopyrightText: 2022 Weston Schmidt <weston_schmidt@alumni.purdue.edu>
 # SPDX-License-Identifier: Apache-2.0
 # Copied from github.com/goschtalt/.github
-
 # @example=## Golang CI Workflow Sample
 ## SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
 ## SPDX-License-Identifier: Apache-2.0
@@ -11,17 +10,22 @@
 #
 #on:
 #  push:
+#    branches:
+#      - main
+#    paths-ignore:
+#      - README.md
 #    tags:
 #      - 'v[0-9]+.[0-9]+.[0-9]+'
 #  pull_request:
 #  workflow_dispatch:
 #
 #jobs:
-#  add-to-project:
+#  ci:
 #    uses: xmidt-org/shared-go/.github/workflows/ci.yml@6a0bec30f42c318c0c1d06705f3f60911ed7c610 # v3.2.0
 #    with:
-#      release-type: library
+#      release-type: program    # or: library
 #    secrets: inherit
+---
 name: 'CI Workflow'
 
 on:
@@ -55,6 +59,15 @@ on:
         required: false
         type: string
         default: .
+      description:
+        description: 'What this project/package does.'
+        required: false
+        type: string
+        default: '${{ github.repository }} does something important.'
+      license:
+        description: "The license this project should use if it doesn't support REUSE/SPDX."
+        required: false
+        type: string
 
 
       # Alphabetize the sections & prefix the names of the sections to the
@@ -170,6 +183,12 @@ on:
         type: string
         default: ''
 
+      release-rpms:
+        description: "If set to true, release generic rpms as well."
+        required: false
+        type: boolean
+        default: true
+
       release-skip-publish:
         description: "Set to --skip-publish to skip publishing."
         required: false
@@ -177,9 +196,21 @@ on:
         default: ''
 
       release-type:
-        description: "The type of artifact to expect and release. [ library | program ]."
+        description: "The type of artifact to expect and release. [ `library`, `program` ]."
         required: true
         type: string
+
+      release-with-extra-contents:
+        description: "The list of any extra files to include in the packaged releases.  See goreleaser nfpm contents for examples."
+        required: false
+        type: string
+        default: ''
+
+      release-with-unique-user:
+        description: "If set to true will add a user and group with the same name as the program.  Otherwise root is assumed."
+        required: false
+        type: string
+        default: true
 
 
       # Copyright focused
@@ -199,16 +230,16 @@ on:
 
 
       # Unit test focused
-      tests-skip:
-        description: 'Skip running the unit tests.'
-        required: false
-        type: boolean
-        default: false
       tests-race:
         description: 'If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done.'
         required: false
         type: boolean
         default: true
+      tests-skip:
+        description: 'Skip running the unit tests.'
+        required: false
+        type: boolean
+        default: false
 
 
 jobs:
@@ -227,6 +258,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           check-latest: ${{ inputs.go-version-latest }}
+          cache-dependency-path: ${{ inputs.working-directory }}
 
       - name: Fetch go:generate dependencies
         if: inputs.go-generate-skip == false
@@ -267,6 +299,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           check-latest: ${{ inputs.go-version-latest }}
+          cache-dependency-path: ${{ inputs.working-directory }}
 
       - name: Fetch go:generate dependencies
         if: inputs.go-generate-skip == false
@@ -308,7 +341,7 @@ jobs:
           path: ${{ inputs.working-directory }}/coverage.txt
 
       - name: Send results to codecov.io
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
         with:
           directory: ${{ inputs.working-directory }}
           flags:     unittests
@@ -364,6 +397,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           check-latest: ${{ inputs.go-version-latest }}
+          cache-dependency-path: ${{ inputs.working-directory }}
 
       - name: Run gofmt
         working-directory: ${{ inputs.working-directory }}
@@ -398,6 +432,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           check-latest: ${{ inputs.go-version-latest }}
+          cache-dependency-path: ${{ inputs.working-directory }}
 
       - name: Fetch go:generate dependencies
         if: inputs.go-generate-skip == false
@@ -452,6 +487,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           check-latest: ${{ inputs.go-version-latest }}
+          cache-dependency-path: ${{ inputs.working-directory }}
 
       # setup ruby environment before running jonabc/setup-licensed
       - name: Setup Ruby
@@ -544,6 +580,7 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           check-latest: ${{ inputs.go-version-latest }}
+          cache-dependency-path: ${{ inputs.working-directory }}
 
       - name: Fetch go:generate dependencies
         if: inputs.go-generate-skip == false
@@ -565,6 +602,7 @@ jobs:
           if [[ $project_name == "" ]]; then
             project_name=$(echo ${{ github.repository }} | sed 's:.*/::')
           fi
+          echo "PROJECT_NAME=${project_name}" >> $GITHUB_ENV
 
           echo "---" > .goreleaser.yml
           gecho() { echo "$1" >> .goreleaser.yml ; }
@@ -657,6 +695,10 @@ jobs:
           gecho "checksum:"
           gecho "  name_template: '{{.ProjectName}}-{{.Version}}-checksums.txt'"
           gecho "  algorithm: sha512"
+          gecho ""
+          gecho "release:"
+          gecho "  extra_files:"
+          gecho "    - glob: ./.extra_files/**"
           gecho ""
           gecho "dockers:"
 
@@ -764,6 +806,131 @@ jobs:
           fi
           gecho ""
 
+      - name: Determine project license(s)
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-rpms        == true
+        shell: bash
+        run: |
+          echo "LICENSE=unknown" >> $GITHUB_ENV
+
+          if [ -d LICENSES ]; then
+            found=`ls LICENSES/|sed 's|\.txt\>||'`
+            echo "LICENSE='$found'" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ inputs.license }}" != "" ]]; then
+            echo "LICENSE='${{ inputs.license }}'" >> $GITHUB_ENV
+          fi
+        
+      - name: Generate the rpm generation section
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-rpms        == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "nfpms:"
+          gecho "  -"
+          gecho "    license:    ${{ env.LICENSE }}"
+          gecho "    maintainer: ${{ github.repository_owner }}"
+          gecho "    homepage:   ${{ github.repository }}"
+          gecho "    rpm:"
+          gecho "      group: System Environment/Daemons"
+          gecho "      signature:"
+          gecho "        key_file: .secrets/rpm_gpg_private_key_file"
+          gecho "    description: |-"
+          gecho "      ${{ inputs.description }}"
+          gecho "    formats:"
+          gecho "      - rpm"
+          gecho "    file_name_template: >-"
+          gecho "      {{ .PackageName }}-{{ .Version }}."
+          gecho "      {{- if eq .Arch \"amd64\" }}x86_64"
+          gecho "      {{- else if eq .Arch \"arm64\" }}aarch64{{ end }}"
+          gecho "    contents:"
+          gecho "      - dst: /var/log/${{ env.PROJECT_NAME }}/"
+          gecho "        type: dir"
+          gecho "        file_info:"
+          gecho "          mode: 0755"
+          if [[ "${{ inputs.release-with-unique-user }}" == "true" ]]; then
+          gecho "          owner: ${{ env.PROJECT_NAME }}"
+          gecho "          group: ${{ env.PROJECT_NAME }}"
+          fi
+
+          gecho "      - src: ${{ env.PROJECT_NAME }}.log"
+          gecho "        dst: /var/log/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.log"
+          gecho "        file_info:"
+          gecho "          mode: 0644"
+          if [[ "${{ inputs.release-with-unique-user }}" == "true" ]]; then
+          gecho "          owner: ${{ env.PROJECT_NAME }}"
+          gecho "          group: ${{ env.PROJECT_NAME }}"
+          fi
+
+          gecho "      - dst: /etc/${{ env.PROJECT_NAME }}/"
+          gecho "        type: dir"
+          gecho "        file_info:"
+          gecho "          mode: 0755"
+          if [[ "${{ inputs.release-with-unique-user }}" == "true" ]]; then
+          gecho "          owner: ${{ env.PROJECT_NAME }}"
+          gecho "          group: ${{ env.PROJECT_NAME }}"
+          fi
+
+          if [[ "${{ inputs.release-with-extra-contents }}" != "" ]]; then
+            mapfile -t lines< <(echo "${LINES}")
+            for line in "${lines[@]}"
+            do
+              gecho "      $line"
+            done
+          fi
+
+          if [[ "${{ inputs.release-with-unique-user }}" == "true" ]]; then
+          gecho "    scripts:"
+          gecho "      preinstall: .scripts/preinstall.sh"
+          gecho "    overrides:"
+          gecho "      rpm:"
+          gecho "        dependencies:"
+          gecho "          - shadow-utils"
+          fi
+          gecho ""
+        env:
+          LINES: ${{ inputs.release-with-extra-contents }}
+
+      - name: Generate the rpm scripts & support files
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-rpms        == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          mkdir -p .scripts
+
+          touch ${{ env.PROJECT_NAME }}.log
+
+          mkdir -p .extra_files
+          mkdir -p .secrets
+          echo "${{ vars.RPM_GPG_PUBLIC_KEY }}"     > .extra_files/RPM-GPG-KEY-comcast-xmidt
+          echo "${{ secrets.RPM_GPG_PRIVATE_KEY }}" > .secrets/rpm_gpg_private_key_file
+
+          if [[ "${{ inputs.release-with-unique-user }}" == "true" ]]; then
+          gecho() { echo "$1" >> .scripts/preinstall.sh ; }
+          rm -f .scripts/preinstall.sh
+          gecho 'getent group  ${{ env.PROJECT_NAME }} > /dev/null || groupadd -r ${{ env.PROJECT_NAME }}'
+          gecho 'getent passwd ${{ env.PROJECT_NAME }} > /dev/null || \'
+          gecho '    useradd \'
+          gecho '        -d /var/run/${{ env.PROJECT_NAME }} \'
+          gecho '        -r \'
+          gecho '        -g ${{ env.PROJECT_NAME }} \'
+          gecho '        -s /sbin/nologin \'
+          gecho '        -c "${{ env.PROJECT_NAME }} server" \'
+          gecho '        ${{ env.PROJECT_NAME }}'
+          gecho ""
+          fi
+
+
       - name: Show the .goreleaser.yml file
         working-directory: ${{ inputs.working-directory }}
         shell: bash
@@ -815,8 +982,17 @@ jobs:
           version:      latest
           args:         release --clean --skip-validate ${{ inputs.release-skip-publish }}
         env:
-          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
-          GITHUB_TOKEN:           ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG:         ${{ github.ref_name }}
+          GITHUB_TOKEN:                   ${{ secrets.GITHUB_TOKEN }}
+          NFPM_DEFAULT_RPM_PASSPHRASE:    ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
+
+      - name: Remove .secrets directory
+        if: |
+          always()
+        shell: bash
+        run: |
+          rm -rf .secrets
+
 
   all_passed:
     needs: [ build_program, unit_test, style, golint, license, copyright, release ]

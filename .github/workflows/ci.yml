@@ -815,10 +815,8 @@ jobs:
         run: |
           echo "LICENSE=unknown" >> $GITHUB_ENV
 
-          tree
-
           if [ -d LICENSES ]; then
-            found=`ls LICENSES/|sed 's|\.txt\>||'
+            found=`ls LICENSES/|sed 's|\.txt\>||'`
             echo "LICENSE='$found'" >> $GITHUB_ENV
           fi
 

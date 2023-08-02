@@ -65,7 +65,7 @@ on:
         type: string
         default: '${{ github.repository }} does something important.'
       license:
-        description: 'The license this project should use if it doesn't support REUSE/SPDX.'
+        description: "The license this project should use if it doesn't support REUSE/SPDX."
         required: false
         type: string
 

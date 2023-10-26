@@ -23,7 +23,7 @@ jobs:
 
       - name: Generate Usage Documentation
         id: documenter
-        uses: gizumon/github-actions-documenter@1057007786b38916b5deef7ac0308a8647c37dc8 # v0.2.1
+        uses: gizumon/github-actions-documenter@843a0f92e66b5db20f76d3c707beb0329b48c628 # v0.2.2
         with:
           should-skip-generate-agenda: false
 

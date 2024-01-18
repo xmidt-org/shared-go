@@ -111,9 +111,38 @@ This workflow does the following things automatically:
 
 # 🔰 Reusable Workflows 🔰
 
-* [1: CI Workflow](#1-ci-workflow) ( [📄](.github/workflows/ci.yml) )
+* [1: Auto Releaser](#1-auto-releaser) ( [📄](.github/workflows/auto-releaser.yml) )
+* [2: CI Workflow](#2-ci-workflow) ( [📄](.github/workflows/ci.yml) )
 
-## 1: CI Workflow
+## 1: Auto Releaser
+## Golang Automatic Patch Releaser Sample
+
+```yaml
+# SPDX-FileCopyrightText: 2024 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+---
+name: 'Automatically relase patch versions.'
+  
+  on:
+    schedule: # Run every day at 12:00 UTC
+      - cron: '0 12 * * *'
+    workflow_dispatch:
+  
+  jobs:
+    release:
+      uses: ./.github/workflows/auto-releaser.ym
+```
+
+### Inputs
+
+| # | Required | Type | Name | Default | Description |
+| :--- | :---: | :---: | :--- | :--- | :--- |
+| 1 |  | string | branch | main | Branch to release from. |
+| 2 |  | string | patch-list | fix, bugfix, perf, refactor, test, tests, chore | Comma separated list of commit types that should trigger a patch release. |
+
+
+
+## 2: CI Workflow
 ## Golang CI Workflow Sample
 
 ```yaml
@@ -179,10 +208,12 @@ jobs:
 | 32 |  | boolean | style-skip | false | Skip building the gofmt check. |
 | 33 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
 | 34 |  | boolean | tests-skip | false | Skip running the unit tests. |
+| 35 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
 
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

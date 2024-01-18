@@ -37,6 +37,7 @@ jobs:
       release-type:         program
       release-docker:       true
       release-docker-file:  ./cmd/foo/Dockerfile
+      upload-skip:          true
     secrets: inherit
 
   command-tag:
@@ -60,6 +61,7 @@ jobs:
       release-docker-latest: true
       release-docker-major:  true
       release-docker-minor:  true
+      upload-skip:          true
     secrets: inherit
 
 
@@ -75,6 +77,7 @@ jobs:
       release-docker:        true
       release-docker-extras: |
         main.go
+      upload-skip:          true
     secrets: inherit
 
   program-tag:
@@ -99,6 +102,7 @@ jobs:
       release-docker-extras:  |
         main.go
         go.mod
+      upload-skip:          true
     secrets: inherit
 
 
@@ -112,6 +116,7 @@ jobs:
       working-directory:    library
       release-type:         library
       release-project-name: library
+      upload-skip:          true
     secrets: inherit
 
   library-tag:
@@ -129,6 +134,7 @@ jobs:
       working-directory:    library
       release-type:         library
       release-project-name: library
+      upload-skip:          true
     secrets: inherit
 
 
@@ -141,6 +147,7 @@ jobs:
       release-type:         program
       release-project-name: program
       release-skip-publish: --skip-publish
+      upload-skip:          true
     secrets: inherit
 
   slow-things-library:
@@ -152,6 +159,7 @@ jobs:
       release-type:         library
       release-project-name: library
       release-skip-publish: --skip-publish
+      upload-skip:          true
     secrets: inherit
 
   tag:

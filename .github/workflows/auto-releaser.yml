@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2024 Comcast Cable Communications Management, LLC
+# SPDX-License-Identifier: Apache-2.0
+# @example=## Golang Automatic Patch Releaser Sample
+## SPDX-FileCopyrightText: 2024 Comcast Cable Communications Management, LLC
+## SPDX-License-Identifier: Apache-2.0
+#---
+#name: 'Automatically relase patch versions.'
+#  
+#  on:
+#    schedule: # Run every day at 12:00 UTC
+#      - cron: '0 12 * * *'
+#    workflow_dispatch:
+#  
+#  jobs:
+#    release:
+#      uses: ./.github/workflows/auto-releaser.ym
+---
+name: 'Auto Releaser'
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to release from.'
+        type: string
+        required: false
+        default: 'main'
+      patch-list:
+        description: 'Comma separated list of commit types that should trigger a patch release.'
+        type: string
+        required: false
+        default: 'fix, bugfix, perf, refactor, test, tests, chore'
+
+jobs:
+  release:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Get Next Version
+        id: semver
+        uses: ietf-tools/semver-action@40241438953247adba0bb977f78b4ba092ec9b83 # v1.7.1
+        with:
+          token:                 ${{ github.token }}
+          branch:                ${{ github.event.inputs.branch }}
+          patchList:             ${{ github.event.inputs.patch-list }}
+          noVersionBumpBehavior: silent
+          noNewCommitBehavior:   silent
+
+      - name: No Release Needed
+        if: |
+          steps.semver.outputs.next == ''
+        run: echo "No release needed."
+
+      - name: Create Release
+        if: |
+          steps.semver.outputs.next != ''
+        uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1.13.0
+        with:
+          name:   ${{ steps.semver.outputs.next }}
+          tag:    ${{ steps.semver.outputs.next }}
+          commit: ${{ github.sha }}
+          token:  ${{ github.token }}

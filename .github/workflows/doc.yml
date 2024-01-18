@@ -63,7 +63,7 @@ jobs:
           inputs.dry-run == false
         uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38 # v5.0.2
         with:
-          title: chore:Update Workflow Documentation
+          title: ignore:Update Workflow Documentation
           body: |
             Update the github action workflow documentation.
           branch: update-workflow-documentation

@@ -130,7 +130,7 @@ name: 'Automatically relase patch versions.'
   
   jobs:
     release:
-      uses: ./.github/workflows/auto-releaser.ym
+      uses: xmidt-org/shared-go/.github/workflows/ci.yml@826aa545bb56f6c7c551d44febb420c0293c8bff # v4.2.0
 ```
 
 ### Inputs
@@ -213,6 +213,7 @@ jobs:
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

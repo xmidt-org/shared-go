@@ -45,8 +45,8 @@ jobs:
         uses: ietf-tools/semver-action@40241438953247adba0bb977f78b4ba092ec9b83 # v1.7.1
         with:
           token:                 ${{ github.token }}
-          branch:                ${{ github.event.inputs.branch }}
-          patchList:             ${{ github.event.inputs.patch-list }}
+          branch:                ${{ inputs.branch }}
+          patchList:             ${{ inputs.patch-list }}
           noVersionBumpBehavior: silent
           noNewCommitBehavior:   silent
 

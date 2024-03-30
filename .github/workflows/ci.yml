@@ -210,7 +210,7 @@ on:
         description: "If set to true will add a user and group with the same name as the program.  Otherwise root is assumed."
         required: false
         type: string
-        default: true
+        default: "true"
 
 
       # Copyright focused
@@ -654,7 +654,7 @@ jobs:
           gecho "    - title: Other Work"
           gecho "      order: 9999"
           gecho ""
-          gecho "sbom:"
+          gecho "sboms:"
           gecho "  - artifacts: archives"
           gecho ""
 

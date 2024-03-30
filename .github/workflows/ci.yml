@@ -575,6 +575,9 @@ jobs:
       needs.license.result       != 'failure'
     runs-on: [ ubuntu-latest ]
     steps:
+      - name: Install syft for sbom generation
+        uses: anchore/sbom-action/download-syft@/ab5d7b5f48981941c4c5d6bf33aeb98fe3bae38c # v0.15.10
+
       - name: Checkout the code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
@@ -650,6 +653,9 @@ jobs:
           gecho "      order: 400"
           gecho "    - title: Other Work"
           gecho "      order: 9999"
+          gecho ""
+          gecho "sbom:"
+          gecho "  - artifacts: archives"
           gecho ""
 
       - name: Generate the library .goreleaser.yml file

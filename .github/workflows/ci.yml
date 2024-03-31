@@ -655,7 +655,7 @@ jobs:
           gecho "      order: 9999"
           gecho ""
           gecho "sboms:"
-          gecho "  - artifacts: archive"
+          gecho "  - artifacts: any"
           gecho ""
 
       - name: Generate the library .goreleaser.yml file
@@ -805,7 +805,7 @@ jobs:
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
-          gecho "    skip_push: true"
+            gecho "    skip_push: true"
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
@@ -987,6 +987,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Update --skip-publish if needed
+        if: |
+          ${{ inputs.release-skip-publish }} == "--skip-publish"
+        shell: bash
+        run: |
+          echo "SKIP_PUBLISH=--skip-publish" >> $GITHUB_ENV
+
       - name: Generate the Release
         if: success() && startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8 # v5.0.0
@@ -994,7 +1001,7 @@ jobs:
           distribution: goreleaser
           workdir:      ${{ inputs.working-directory }}
           version:      latest
-          args:         release --clean --skip-validate ${{ inputs.release-skip-publish }}
+          args:         release --clean --skip=validate ${{ env.SKIP_PUBLISH }}
         env:
           GORELEASER_CURRENT_TAG:         ${{ github.ref_name }}
           GITHUB_TOKEN:                   ${{ secrets.GITHUB_TOKEN }}

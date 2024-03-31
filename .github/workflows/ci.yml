@@ -654,8 +654,21 @@ jobs:
           gecho "    - title: Other Work"
           gecho "      order: 9999"
           gecho ""
+
+      - name: Generate sbom rules to the .goreleaser.yml file
+        if: |
+          inputs.release-custom-file == false &&
+          inputs.release-type        == 'program'
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+
           gecho "sboms:"
-          gecho "  - artifacts: any"
+          gecho "  - artifacts: archive"
+          if [[ "${{ inputs.release-rpms }}" == "true" ]]; then
+          gecho "  - artifacts: package"
+          if
           gecho ""
 
       - name: Generate the library .goreleaser.yml file
@@ -805,7 +818,7 @@ jobs:
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
-            gecho "    skip_push: true"
+          gecho "    skip_push: true"
           fi
 
           gecho "    dockerfile: '${{ inputs.release-docker-file }}'"
@@ -992,7 +1005,7 @@ jobs:
           ${{ inputs.release-skip-publish }} == "--skip-publish"
         shell: bash
         run: |
-          echo "SKIP_PUBLISH=--skip-publish" >> $GITHUB_ENV
+          echo "SKIP_PUBLISH=--skip=publish" >> $GITHUB_ENV
 
       - name: Generate the Release
         if: success() && startsWith(github.ref, 'refs/tags/')

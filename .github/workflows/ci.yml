@@ -655,7 +655,7 @@ jobs:
           gecho "      order: 9999"
           gecho ""
           gecho "sboms:"
-          gecho "  - artifacts: archives"
+          gecho "  - artifacts: archive"
           gecho ""
 
       - name: Generate the library .goreleaser.yml file

@@ -668,7 +668,7 @@ jobs:
           gecho "  - artifacts: archive"
           if [[ "${{ inputs.release-rpms }}" == "true" ]]; then
           gecho "  - artifacts: package"
-          if
+          fi
           gecho ""
 
       - name: Generate the library .goreleaser.yml file

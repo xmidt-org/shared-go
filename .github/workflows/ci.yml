@@ -665,9 +665,11 @@ jobs:
           gecho() { echo "$1" >> .goreleaser.yml ; }
 
           gecho "sboms:"
-          gecho "  - artifacts: archive"
+          gecho "  - id: archive"
+          gecho "    artifacts: archive"
           if [[ "${{ inputs.release-rpms }}" == "true" ]]; then
-          gecho "  - artifacts: package"
+          gecho "  - id: package"
+          gecho "    artifacts: package"
           fi
           gecho ""
 

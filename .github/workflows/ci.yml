@@ -1003,11 +1003,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update --skip-publish if needed
-        if: |
-          ${{ inputs.release-skip-publish }} == "--skip-publish"
         shell: bash
         run: |
-          echo "SKIP_PUBLISH=--skip=publish" >> $GITHUB_ENV
+          if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
+            echo "SKIP_PUBLISH=--skip=publish" >> $GITHUB_ENV
+          fi
 
       - name: Generate the Release
         if: success() && startsWith(github.ref, 'refs/tags/')

@@ -1,29 +1,29 @@
 # SPDX-FileCopyrightText: 2024 Comcast Cable Communications Management, LLC
 # SPDX-License-Identifier: Apache-2.0
 ---
-    name: 'Cleanup testing tags.'
-    
-    on:
-      schedule:
-        - cron: '52 1 * * 1'  # Monday at 1:52am UTC clean everything up
-      workflow_dispatch:
-    
-    jobs:
-      remove-tags:
-        runs-on: [ ubuntu-latest ]
-        steps:
-          - name: Checkout the code
-            uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
-            with:
-              fetch-depth: 0
-              token: ${{ secrets.PUSH_TAG_TOKEN }}
-    
-          - name: Search for v1.x.x or v2.x.x tags to remove
-            shell: bash
-            run: |
-              mapfile -t tags< <(git tag | grep "v[12]\.")
-              for tag in "${tags[@]}"; do
-                echo "Removing $tag"
-                git tag -d $tag
-                git push origin :refs/tags/$tag
-              done
+name: 'Cleanup testing tags.'
+
+on:
+  schedule:
+    - cron: '52 1 * * 1'  # Monday at 1:52am UTC clean everything up
+  workflow_dispatch:
+
+jobs:
+  remove-tags:
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PUSH_TAG_TOKEN }}
+
+      - name: Search for v1.x.x or v2.x.x tags to remove
+        shell: bash
+        run: |
+          mapfile -t tags< <(git tag | grep "v[12]\.")
+          for tag in "${tags[@]}"; do
+            echo "Removing $tag"
+            git tag -d $tag
+            git push origin :refs/tags/$tag
+          done

@@ -163,7 +163,7 @@ jobs:
     secrets: inherit
 
   tag:
-    needs: 
+    needs:
       - command
       - program
       - library

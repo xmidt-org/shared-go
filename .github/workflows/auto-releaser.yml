@@ -5,12 +5,12 @@
 ## SPDX-License-Identifier: Apache-2.0
 #---
 #name: 'Automatically relase patch versions.'
-#  
+#
 #  on:
 #    schedule: # Run every day at 12:00 UTC
 #      - cron: '0 12 * * *'
 #    workflow_dispatch:
-#  
+#
 #  jobs:
 #    release:
 #      uses: xmidt-org/shared-go/.github/workflows/ci.yml@826aa545bb56f6c7c551d44febb420c0293c8bff # v4.2.0

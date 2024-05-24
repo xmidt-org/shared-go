@@ -122,12 +122,12 @@ This workflow does the following things automatically:
 # SPDX-License-Identifier: Apache-2.0
 ---
 name: 'Automatically relase patch versions.'
-  
+
   on:
     schedule: # Run every day at 12:00 UTC
       - cron: '0 12 * * *'
     workflow_dispatch:
-  
+
   jobs:
     release:
       uses: xmidt-org/shared-go/.github/workflows/ci.yml@826aa545bb56f6c7c551d44febb420c0293c8bff # v4.2.0
@@ -177,7 +177,7 @@ jobs:
 | 1 |  | string | go-version | ^1.20.x | The go version to use.  Example: '1.20.x' |
 | 2 |  | boolean | go-version-latest | true | Will always use the latest version of go available. |
 | 3 |  | boolean | go-generate-skip | true | Skip running go generate if needed. |
-| 4 |  | string | go-generate-deps |  | The line sparated list of go generate dependencies to install via `go install` prior to running `go generate`. |
+| 4 |  | string | go-generate-deps |  | The line sparated list of go generate dependencies to install via<br>`go install` prior to running `go generate`. |
 | 5 |  | string | working-directory | . | The working directory for this project. |
 | 6 |  | string | description | ${{ github.repository }} does something important. | What this project/package does. |
 | 7 |  | string | license |  | The license this project should use if it doesn't support REUSE/SPDX. |
@@ -192,27 +192,30 @@ jobs:
 | 16 |  | string | release-binary-name |  | If the project needs a custom name, use set it here. |
 | 17 |  | boolean | release-custom-file | false | If the project needs a custom release file, use that instead. |
 | 18 |  | boolean | release-docker | false | If set to true, release a container to gocr as well. |
-| 19 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of files/dirs to make available. |
-| 20 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of `Dockerfile` in the project root. |
+| 19 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of<br>files/dirs to make available. |
+| 20 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of<br>`Dockerfile` in the project root. |
 | 21 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
-| 22 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for the major version. |
+| 22 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for<br>the major version. |
 | 23 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
 | 24 |  | string | release-main-package | . | Path to main.go file or main package. |
 | 25 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
 | 26 |  | boolean | release-rpms | true | If set to true, release generic rpms as well. |
-| 27 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
-| 28 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
-| 29 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See goreleaser nfpm contents for examples. |
-| 30 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the program.  Otherwise root is assumed. |
-| 31 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
-| 32 |  | boolean | style-skip | false | Skip building the gofmt check. |
-| 33 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done. |
-| 34 |  | boolean | tests-skip | false | Skip running the unit tests. |
-| 35 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
+| 27 |  | boolean | release-skip | false | Skip releasing the program. |
+| 28 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
+| 29 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
+| 30 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See<br>goreleaser nfpm contents for examples. |
+| 31 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the<br>program.  Otherwise root is assumed. |
+| 32 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
+| 33 |  | boolean | style-skip | false | Skip building the gofmt check. |
+| 34 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed<br>during unit tests.  Otherwise no race condition checking will be done. |
+| 35 |  | boolean | tests-skip | false | Skip running the unit tests. |
+| 36 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
+| 37 |  | boolean | yaml-lint-skip | false | Skip linting yaml files. |
 
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

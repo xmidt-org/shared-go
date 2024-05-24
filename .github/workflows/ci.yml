@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2022-2023 Comcast Cable Communications Management, LLC
+# SPDX-FileCopyrightText: 2022-2024 Comcast Cable Communications Management, LLC
 # SPDX-FileCopyrightText: 2022 Weston Schmidt <weston_schmidt@alumni.purdue.edu>
 # SPDX-License-Identifier: Apache-2.0
 # Copied from github.com/goschtalt/.github
@@ -50,7 +50,9 @@ on:
         type: boolean
         default: true
       go-generate-deps:
-        description: "The line sparated list of go generate dependencies to install via `go install` prior to running `go generate`."
+        description: |
+          The line sparated list of go generate dependencies to install via
+          `go install` prior to running `go generate`.
         required: false
         type: string
         default: ''
@@ -143,12 +145,16 @@ on:
         default: false
 
       release-docker-extras:
-        description: "Provides a way to set the `extra_files` field with the list of files/dirs to make available."
+        description: |
+          Provides a way to set the `extra_files` field with the list of
+          files/dirs to make available.
         required: false
         type: string
 
       release-docker-file:
-        description: "Set to the docker file and path if you don't want the default of `Dockerfile` in the project root."
+        description: |
+          Set to the docker file and path if you don't want the default of
+          `Dockerfile` in the project root.
         required: false
         type: string
         default: 'Dockerfile'
@@ -160,7 +166,9 @@ on:
         default: false
 
       release-docker-major:
-        description: "If set to true, release this container as the latest for the major version."
+        description: |
+          If set to true, release this container as the latest for
+          the major version.
         required: false
         type: boolean
         default: false
@@ -189,6 +197,12 @@ on:
         type: boolean
         default: true
 
+      release-skip:
+        description: 'Skip releasing the program.'
+        required: false
+        type: boolean
+        default: false
+
       release-skip-publish:
         description: "Set to --skip-publish to skip publishing."
         required: false
@@ -201,13 +215,17 @@ on:
         type: string
 
       release-with-extra-contents:
-        description: "The list of any extra files to include in the packaged releases.  See goreleaser nfpm contents for examples."
+        description: |
+          The list of any extra files to include in the packaged releases.  See
+          goreleaser nfpm contents for examples.
         required: false
         type: string
         default: ''
 
       release-with-unique-user:
-        description: "If set to true will add a user and group with the same name as the program.  Otherwise root is assumed."
+        description: |
+          If set to true will add a user and group with the same name as the
+          program.  Otherwise root is assumed.
         required: false
         type: string
         default: "true"
@@ -231,7 +249,9 @@ on:
 
       # Unit test focused
       tests-race:
-        description: 'If set to "true" (default), race condition checking will be performed during unit tests.  Otherwise no race condition checking will be done.'
+        description: |
+          If set to "true" (default), race condition checking will be performed
+          during unit tests.  Otherwise no race condition checking will be done.
         required: false
         type: boolean
         default: true
@@ -241,8 +261,16 @@ on:
         type: boolean
         default: false
 
+      # Artifact uploading focused
       upload-skip:
         description: 'Skip uploading the artifacts.'
+        required: false
+        type: boolean
+        default: false
+
+      # YML linting focused
+      yaml-lint-skip:
+        description: 'Skip linting yaml files.'
         required: false
         type: boolean
         default: false
@@ -426,7 +454,6 @@ jobs:
           retention-days: 10
 
 
-
   golint:
     runs-on: [ ubuntu-latest ]
     name: Go Lint
@@ -467,14 +494,21 @@ jobs:
           version: ${{ inputs.lint-version }}
           working-directory: ${{ inputs.working-directory }}
           args: --timeout ${{ inputs.lint-timeout }}
-          skip-pkg-cache: true
-          skip-build-cache: true
+          skip-cache: true
 
+  ymllint:
+    runs-on: [ ubuntu-latest ]
+    if: inputs.yaml-lint-skip == false
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c # v3.1.1
 
   copyright:
     runs-on: [ ubuntu-latest ]
     if: inputs.copyright-skip == false
-    steps: 
+    steps:
       - name: Checkout the code
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
@@ -506,8 +540,8 @@ jobs:
       - name: Setup licensed
         uses: jonabc/setup-licensed@d6b3a6f7058c2b40c06d205e13e15c2418977566 # v1.1.4
         with:
-         version: 4.x
-         github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: 4.x
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch Org Approved Licenses & merge to local
         shell: bash
@@ -562,7 +596,7 @@ jobs:
       packages: write
 
     name: Release
-    needs: [ build_program, unit_test, style, golint, license, copyright ]
+    needs: [ build_program, unit_test, style, golint, license, copyright, ymllint ]
     if: |
       always() &&
       inputs.release-skip        == false     &&
@@ -571,6 +605,7 @@ jobs:
       needs.unit_test.result     != 'failure' &&
       needs.style.result         != 'failure' &&
       needs.golint.result        != 'failure' &&
+      needs.ymllint.result       != 'failure' &&
       needs.copyright.result     != 'failure' &&
       needs.license.result       != 'failure'
     runs-on: [ ubuntu-latest ]
@@ -852,7 +887,7 @@ jobs:
           if [[ "${{ inputs.license }}" != "" ]]; then
             echo "LICENSE='${{ inputs.license }}'" >> $GITHUB_ENV
           fi
-        
+
       - name: Generate the rpm generation section
         if: |
           inputs.release-custom-file == false     &&

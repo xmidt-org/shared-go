@@ -15,6 +15,7 @@ on:
       - 'command/cmd/foo/**'
       - 'library/**'
       - 'program/**'
+      - 'README.md'
     tags:
       - 'v1.*'
 

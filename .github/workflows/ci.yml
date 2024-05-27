@@ -273,7 +273,7 @@ on:
         description: 'Skip linting yaml files.'
         required: false
         type: boolean
-        default: false
+        default: true
 
 jobs:
 

@@ -210,11 +210,12 @@ jobs:
 | 34 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed<br>during unit tests.  Otherwise no race condition checking will be done. |
 | 35 |  | boolean | tests-skip | false | Skip running the unit tests. |
 | 36 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
-| 37 |  | boolean | yaml-lint-skip | false | Skip linting yaml files. |
+| 37 |  | boolean | yaml-lint-skip | true | Skip linting yaml files. |
 
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

@@ -28,6 +28,6 @@ rules:
     indent-sequences: consistent
   line-length:
     level: warning
-    max: 110
+    max: 130
     allow-non-breakable-inline-mappings: true
   truthy: disable

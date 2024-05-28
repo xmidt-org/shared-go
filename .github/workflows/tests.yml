@@ -149,6 +149,7 @@ jobs:
       release-project-name: program
       release-skip-publish: --skip-publish
       upload-skip:          true
+      yaml-lint-skip:       false
     secrets: inherit
 
   slow-things-library:

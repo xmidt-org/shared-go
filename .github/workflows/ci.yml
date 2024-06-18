@@ -531,14 +531,14 @@ jobs:
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 
-      # setup ruby environment before running jonabc/setup-licensed
+      # setup ruby environment before running github/setup-licensed
       - name: Setup Ruby
         uses: ruby/setup-ruby@3783f195e29b74ae398d7caca108814bbafde90e # v1.180.1
         with:
           ruby-version: ruby
 
       - name: Setup licensed
-        uses: jonabc/setup-licensed@d6b3a6f7058c2b40c06d205e13e15c2418977566 # v1.1.4
+        uses: github/setup-licensed@d6b3a6f7058c2b40c06d205e13e15c2418977566 #v1.1.4
         with:
           version: 4.x
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -1066,7 +1066,7 @@ jobs:
 
 
   all_passed:
-    needs: [ build_program, unit_test, style, golint, license, copyright, release ]
+    needs: [ build_program, unit_test, style, golint, license, copyright, release, ymllint ]
     if: always()
     name: All checks passed check.
     runs-on: [ubuntu-latest]
@@ -1079,6 +1079,7 @@ jobs:
           needs.golint.result           == 'failure' ||
           needs.license.result          == 'failure' ||
           needs.copyright.result        == 'failure' ||
+          needs.ymllint.result          == 'failure' ||
           needs.release.result          == 'failure'
         run: exit 1
       - run: 'echo "✅ All required jobs have passed!"'

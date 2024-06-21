@@ -131,6 +131,7 @@ name: 'Automatically relase patch versions.'
   jobs:
     release:
       uses: xmidt-org/shared-go/.github/workflows/ci.yml@826aa545bb56f6c7c551d44febb420c0293c8bff # v4.2.0
+      secrets: inherit
 ```
 
 ### Inputs
@@ -139,6 +140,7 @@ name: 'Automatically relase patch versions.'
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | 1 |  | string | branch | main | Branch to release from. |
 | 2 |  | string | patch-list | fix, bugfix, perf, refactor, test, tests, chore | Comma separated list of commit types that should trigger a patch release. |
+| 3 |  | string | which | tag | Create a 'release' or 'tag'. |
 
 
 
@@ -215,6 +217,7 @@ jobs:
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

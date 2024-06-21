@@ -20,16 +20,24 @@ name: 'Auto Releaser'
 on:
   workflow_call:
     inputs:
+
       branch:
         description: 'Branch to release from.'
         type: string
         required: false
         default: 'main'
+
       patch-list:
         description: 'Comma separated list of commit types that should trigger a patch release.'
         type: string
         required: false
         default: 'fix, bugfix, perf, refactor, test, tests, chore'
+
+      which:
+        description: Create a 'release' or 'tag'.
+        type: string
+        required: false
+        default: tag
 
 jobs:
   release:
@@ -57,10 +65,34 @@ jobs:
 
       - name: Create Release
         if: |
-          steps.semver.outputs.next != ''
+          steps.semver.outputs.next != '' &&
+          inputs.which == 'tag'
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
         with:
           name:   ${{ steps.semver.outputs.next }}
           tag:    ${{ steps.semver.outputs.next }}
           commit: ${{ github.sha }}
           token:  ${{ github.token }}
+
+      - name: Create Tag
+        if: |
+          steps.semver.outputs.next != '' &&
+          inputs.which == 'tag'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.semver.outputs.next }}',
+              sha: context.sha
+            }
+
+      - name: Failure
+        if: |
+          steps.semver.outputs.next != '' &&
+          inputs.which != 'release' &&
+          inputs.which != 'tag'
+        run: |
+          echo "No new version found."
+          exit

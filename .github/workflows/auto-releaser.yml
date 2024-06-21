@@ -14,6 +14,7 @@
 #  jobs:
 #    release:
 #      uses: xmidt-org/shared-go/.github/workflows/ci.yml@826aa545bb56f6c7c551d44febb420c0293c8bff # v4.2.0
+#      secrets: inherit
 ---
 name: 'Auto Releaser'
 
@@ -80,6 +81,7 @@ jobs:
           inputs.which == 'tag'
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
+          github-token: ${{ secrets.PUSH_TAG_TOKEN }}
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,

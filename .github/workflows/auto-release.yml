@@ -11,3 +11,4 @@ on:
 jobs:
   release:
     uses: ./.github/workflows/auto-releaser.yml
+    secrets: inherit

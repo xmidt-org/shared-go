@@ -86,7 +86,7 @@ jobs:
               repo: context.repo.repo,
               ref: 'refs/tags/${{ steps.semver.outputs.next }}',
               sha: context.sha
-            }
+            })
 
       - name: Failure
         if: |

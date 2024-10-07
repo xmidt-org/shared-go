@@ -539,7 +539,7 @@ jobs:
           ruby-version: ruby
 
       - name: Setup licensed
-        uses: github/setup-licensed@38fcaca2db088c8a3ebd4a2a3b2d8bcf4018373c #v1.2.0
+        uses: github/setup-licensed@c1e1a0b702c3e74efe86efd45e9f4307341594d9 #v1.3.0
         with:
           version: 4.x
           github_token: ${{ secrets.GITHUB_TOKEN }}

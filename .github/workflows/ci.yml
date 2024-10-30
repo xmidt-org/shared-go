@@ -612,7 +612,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Install syft for sbom generation
-        uses: anchore/sbom-action/download-syft@1ca97d9028b51809cf6d3c934c3e160716e1b605 # v0.17.5
+        uses: anchore/sbom-action/download-syft@251a468eed47e5082b105c3ba6ee500c0e65a764 # v0.17.6
 
       - name: Checkout the code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

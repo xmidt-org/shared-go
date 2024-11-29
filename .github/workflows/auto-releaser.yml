@@ -32,7 +32,13 @@ on:
         description: 'Comma separated list of commit types that should trigger a patch release.'
         type: string
         required: false
-        default: 'fix, bugfix, perf, refactor, test, tests, chore'
+        default: fix, Fix, FIX, bugfix, Bugfix, BugFix, BUGFIX, perf, refactor, Refactor, REFACTOR, test, Test, TEST, tests, Tests, TESTS, chore, Chore, CHORE
+
+      minor-list:
+        description: 'The specific minor prefix names to use for minors.'
+        type: string
+        required: false
+        default: feat, Feat, FEAT, feature, Feature, FEATURE
 
       which:
         description: Create a 'release' or 'tag'.
@@ -56,6 +62,7 @@ jobs:
           token:                 ${{ github.token }}
           branch:                ${{ inputs.branch }}
           patchList:             ${{ inputs.patch-list }}
+          minorList:             ${{ inputs.minor-list }}
           noVersionBumpBehavior: silent
           noNewCommitBehavior:   silent
 

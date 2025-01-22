@@ -989,7 +989,9 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         shell: bash
         run: |
+          mkdir -p .extra_files
           mkdir -p .secrets
+
           echo "${{ vars.RPM_GPG_PUBLIC_KEY }}"     > .extra_files/RPM-GPG-KEY-comcast-xmidt
           echo "${{ secrets.RPM_GPG_PRIVATE_KEY }}" > .secrets/rpm_gpg_private_key_file
 
@@ -1000,7 +1002,9 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         shell: bash
         run: |
+          mkdir -p .extra_files
           mkdir -p .secrets
+
           echo "${{ vars.RPM_GPG_PUBLIC_KEY }}"     > .extra_files/DEB-GPG-KEY-comcast-xmidt
           echo "${{ secrets.RPM_GPG_PRIVATE_KEY }}" > .secrets/deb_gpg_private_key_file
 
@@ -1016,8 +1020,6 @@ jobs:
         shell: bash
         run: |
           mkdir -p .scripts
-
-          mkdir -p .extra_files
 
           touch ${{ env.PROJECT_NAME }}.log
 

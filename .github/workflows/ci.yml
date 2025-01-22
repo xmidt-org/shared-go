@@ -138,6 +138,12 @@ on:
         type: boolean
         default: false
 
+      release-debs:
+        description: "If set to true, release generic debs as well."
+        required: false
+        type: boolean
+        default: true
+
       release-docker:
         description: "If set to true, release a container to gocr as well."
         required: false
@@ -893,7 +899,10 @@ jobs:
         if: |
           inputs.release-custom-file == false     &&
           inputs.release-type        == 'program' &&
-          inputs.release-rpms        == true
+          (
+            inputs.release-rpms      == true ||
+            inputs.release-debs      == true
+          )
         working-directory: ${{ inputs.working-directory }}
         shell: bash
         run: |
@@ -903,10 +912,20 @@ jobs:
           gecho "    license:    ${{ env.LICENSE }}"
           gecho "    maintainer: ${{ github.repository_owner }}"
           gecho "    homepage:   ${{ github.repository }}"
+
+          if [[ "${{ inputs.release-rpms }}" == "true" ]]; then
           gecho "    rpm:"
           gecho "      group: System Environment/Daemons"
           gecho "      signature:"
           gecho "        key_file: .secrets/rpm_gpg_private_key_file"
+          fi
+
+          if [[ "${{ inputs.release-debs }}" == "true" ]]; then
+          gecho "    deb:
+          gecho "      signature:
+          gecho "        key_file: .secrets/deb_gpg_private_key_file
+          fi
+
           gecho "    description: |-"
           gecho "      ${{ inputs.description }}"
           gecho "    formats:"
@@ -963,22 +982,44 @@ jobs:
         env:
           LINES: ${{ inputs.release-with-extra-contents }}
 
-      - name: Generate the rpm scripts & support files
+      - name: Handle the RPM signing keys
+        if: |
+          inputs.release-type == 'program' &&
+          inputs.release-rpms == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          mkdir -p .secrets
+          echo "${{ vars.RPM_GPG_PUBLIC_KEY }}"     > .extra_files/RPM-GPG-KEY-comcast-xmidt
+          echo "${{ secrets.RPM_GPG_PRIVATE_KEY }}" > .secrets/rpm_gpg_private_key_file
+
+      - name: Handle the DEB signing keys
+        if: |
+          inputs.release-type == 'program' &&
+          inputs.release-debs == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          mkdir -p .secrets
+          echo "${{ vars.RPM_GPG_PUBLIC_KEY }}"     > .extra_files/DEB-GPG-KEY-comcast-xmidt
+          echo "${{ secrets.RPM_GPG_PRIVATE_KEY }}" > .secrets/deb_gpg_private_key_file
+
+      - name: Generate the scripts & support files
         if: |
           inputs.release-custom-file == false     &&
           inputs.release-type        == 'program' &&
-          inputs.release-rpms        == true
+          (
+            inputs.release-rpms      == true ||
+            inputs.release-debs      == true
+          )
         working-directory: ${{ inputs.working-directory }}
         shell: bash
         run: |
           mkdir -p .scripts
 
-          touch ${{ env.PROJECT_NAME }}.log
-
           mkdir -p .extra_files
-          mkdir -p .secrets
-          echo "${{ vars.RPM_GPG_PUBLIC_KEY }}"     > .extra_files/RPM-GPG-KEY-comcast-xmidt
-          echo "${{ secrets.RPM_GPG_PRIVATE_KEY }}" > .secrets/rpm_gpg_private_key_file
+
+          touch ${{ env.PROJECT_NAME }}.log
 
           if [[ "${{ inputs.release-with-unique-user }}" == "true" ]]; then
           gecho() { echo "$1" >> .scripts/preinstall.sh ; }

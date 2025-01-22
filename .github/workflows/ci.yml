@@ -921,9 +921,9 @@ jobs:
           fi
 
           if [[ "${{ inputs.release-debs }}" == "true" ]]; then
-          gecho "    deb:
-          gecho "      signature:
-          gecho "        key_file: .secrets/deb_gpg_private_key_file
+          gecho "    deb:"
+          gecho "      signature:"
+          gecho "        key_file: .secrets/deb_gpg_private_key_file"
           fi
 
           gecho "    description: |-"

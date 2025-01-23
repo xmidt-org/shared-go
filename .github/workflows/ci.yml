@@ -35,7 +35,7 @@ on:
       # General or common inputs.  These cross cut concerns generally and shouldn't
       # be included in the more targetted sections below.
       go-version:
-        description: "The go version to use.  Example: '1.20.x'"
+        description: "This input is deprecated. The value present in the go.mod file is used instead."
         required: false
         type: string
         default: '^1.20.x'
@@ -295,7 +295,7 @@ jobs:
       - name: Setup go version
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.working-directory }}/go.mod
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 
@@ -336,7 +336,7 @@ jobs:
       - name: Setup go version
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.working-directory }}/go.mod
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 
@@ -437,7 +437,7 @@ jobs:
       - name: Setup go version
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.working-directory }}/go.mod
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 
@@ -472,7 +472,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.working-directory }}/go.mod
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 
@@ -534,7 +534,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.working-directory }}/go.mod
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 
@@ -631,7 +631,7 @@ jobs:
       - name: Setup go version
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.working-directory }}/go.mod
           check-latest: ${{ inputs.go-version-latest }}
           cache-dependency-path: ${{ inputs.working-directory }}
 

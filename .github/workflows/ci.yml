@@ -1100,6 +1100,7 @@ jobs:
           GORELEASER_CURRENT_TAG:         ${{ github.ref_name }}
           GITHUB_TOKEN:                   ${{ secrets.GITHUB_TOKEN }}
           NFPM_DEFAULT_RPM_PASSPHRASE:    ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
+          NFPM_DEFAULT_DEB_PASSPHRASE:    ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
 
       - name: Remove .secrets directory
         if: |

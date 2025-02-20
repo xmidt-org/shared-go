@@ -795,18 +795,18 @@ jobs:
           gecho "      - \"--label=org.opencontainers.image.source=https://github.com/${{ github.repository }}\""
           gecho "      - \"--label=org.opencontainers.image.version={{.Version}}\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-amd64"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-amd64"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}"
           fi
 
           if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:latest-amd64"
+          gecho "      - ghcr.io/${{ github.repository }}:latest"
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
@@ -847,18 +847,18 @@ jobs:
           gecho "      - \"--label=org.opencontainers.image.revision={{.FullCommit}}\""
           gecho "      - \"--label=org.opencontainers.image.version={{.Version}}\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
+          gecho "      - ghcr.io/${{ github.repository }}-arm64:{{ .Tag }}"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-arm64"
+          gecho "      - ghcr.io/${{ github.repository }}-arm64:v{{ .Major }}"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-arm64"
+          gecho "      - ghcr.io/${{ github.repository }}-arm64:v{{ .Major }}.{{ .Minor }}"
           fi
 
           if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:latest-arm64"
+          gecho "      - ghcr.io/${{ github.repository }}-arm64:latest"
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then

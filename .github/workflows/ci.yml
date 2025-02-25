@@ -795,6 +795,7 @@ jobs:
           gecho "      - \"--label=org.opencontainers.image.source=https://github.com/${{ github.repository }}\""
           gecho "      - \"--label=org.opencontainers.image.version={{.Version}}\""
           gecho "      - \"--build-arg=ARCH=amd64\""
+          gecho "      - \"--build-arg=PLATFORM=linux/amd64\""
           gecho "    image_templates:"
           gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}"
 
@@ -848,6 +849,7 @@ jobs:
           gecho "      - \"--label=org.opencontainers.image.revision={{.FullCommit}}\""
           gecho "      - \"--label=org.opencontainers.image.version={{.Version}}\""
           gecho "      - \"--build-arg=ARCH=arm64\""
+          gecho "      - \"--build-arg=PLATFORM=linux/arm64v8\""
           gecho "    image_templates:"
           gecho "      - ghcr.io/${{ github.repository }}-arm64:{{ .Tag }}"
 

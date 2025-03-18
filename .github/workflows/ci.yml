@@ -496,7 +496,7 @@ jobs:
       # working-directory and only-new-issues aren't compatible so run for entire repo each time.
       - name: Lint Entire Repo
         if: github.event_name != 'pull_request'
-        uses: golangci/golangci-lint-action@4696ba8babb6127d732c3c6dde519db15edab9ea # v6.5.1
+        uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
         with:
           version: ${{ inputs.lint-version }}
           working-directory: ${{ inputs.working-directory }}

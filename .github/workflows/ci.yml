@@ -797,18 +797,18 @@ jobs:
           gecho "      - \"--build-arg=ARCH=amd64\""
           gecho "      - \"--build-arg=PLATFORM=linux/amd64\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }-amd64}"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-amd64"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-amd64"
           fi
 
           if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:latest"
+          gecho "      - ghcr.io/${{ github.repository }}:latest-amd64"
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then

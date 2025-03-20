@@ -368,7 +368,7 @@ jobs:
       # upload report as artifact
       - name: Archive unit tests report
         if: inputs.upload-skip == false
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: report
           path: ${{ inputs.working-directory }}/report.json
@@ -376,7 +376,7 @@ jobs:
       # upload coverage as artifact
       - name: Archive code coverage results
         if: inputs.upload-skip == false
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: coverage
           path: ${{ inputs.working-directory }}/coverage.txt
@@ -454,7 +454,7 @@ jobs:
 
       - name: Archive code style results
         if: inputs.upload-skip == false
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: fmt
           path: ${{ inputs.working-directory }}/fmt.patch
@@ -589,7 +589,7 @@ jobs:
 
       - name: Archive license results
         if: always() && inputs.upload-skip == false
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: licensing
           path: |

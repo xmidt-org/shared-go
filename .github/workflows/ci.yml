@@ -881,6 +881,31 @@ jobs:
           fi
           gecho ""
 
+      - name: Generate the docker manifest
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-docker      == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          # check for config-breaking set if input params
+          if [[ (${{ inputs.release-arch-arm64 }} == "false" ) && (${{ inputs.release-arch-arm64  == "false") ]]; then
+            echo "error condition: release-docker must include either release-arch-arm64 and/or arm64, both are false"
+            exit -1
+          fi
+
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "docker_manifests:"
+          gecho "  - name_template: ghcr.io/${{ github.repository }}:{{ .Tag }}"
+          gecho "    image_templates:"
+          if [[ "${{ inputs.release-arch-amd64 }}" == "true" ]]; then
+            gecho "      -  ghcr.io/${{ github.repository }}-amd64:{{ .Tag }}"
+          fi
+          if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+            gecho "      -  ghcr.io/${{ github.repository }}-arm64:{{ .Tag }}"
+          fi
+
       - name: Determine project license(s)
         if: |
           inputs.release-custom-file == false     &&

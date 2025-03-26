@@ -617,6 +617,9 @@ jobs:
       needs.license.result       != 'failure'
     runs-on: [ ubuntu-latest ]
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@fcd3152d8ad392d0e9c14d3f0de40f0a88b8ca0e #v3.6.0
+
       - name: Install syft for sbom generation
         uses: anchore/sbom-action/download-syft@f325610c9f50a54015d37c8d16cb3b0e2c8f4de0 # v0.18.0
 
@@ -797,18 +800,18 @@ jobs:
           gecho "      - \"--build-arg=ARCH=amd64\""
           gecho "      - \"--build-arg=PLATFORM=linux/amd64\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-amd64"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-amd64"
           fi
 
           if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:latest"
+          gecho "      - ghcr.io/${{ github.repository }}:latest-amd64"
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
@@ -851,18 +854,18 @@ jobs:
           gecho "      - \"--build-arg=ARCH=arm64\""
           gecho "      - \"--build-arg=PLATFORM=linux/arm64v8\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:{{ .Tag }}"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:v{{ .Major }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-arm64"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:v{{ .Major }}.{{ .Minor }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-arm64"
           fi
 
           if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:latest"
+          gecho "      - ghcr.io/${{ github.repository }}:latest-arm64"
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
@@ -880,6 +883,65 @@ jobs:
             done
           fi
           gecho ""
+
+      - name: Generate the docker manifest
+        if: |
+          inputs.release-custom-file == false     &&
+          inputs.release-type        == 'program' &&
+          inputs.release-docker      == true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: |
+          # check for config-breaking set if input params
+          if [[ ("${{ inputs.release-arch-arm64 }}" == "false" ) && ("${{ inputs.release-arch-arm64 }}" == "false") ]]; then
+            echo "error condition: release-docker must include either release-arch-arm64/amd64, both are false"
+            exit -1
+          fi
+
+          gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "docker_manifests:"
+          gecho "  - name_template: ghcr.io/${{ github.repository }}:{{ .Tag }}"
+          gecho "    image_templates:"
+          if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+            gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
+          fi
+          if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+            gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
+          fi
+
+          if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
+            gecho "  - name_template: ghcr.io/${{ github.repository }}:v{{ .Major }}"
+            gecho "    image_templates:"
+            if [[ "${{ inputs.release-arch-amd64 }}" == "true" ]]; then
+                      gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-amd64"
+            fi
+            if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+                      gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-arm64"
+            fi
+          fi
+
+          if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
+            gecho "  - name_template: ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}"
+            gecho "    image_templates:"
+            if [[ "${{ inputs.release-arch-amd64 }}" == "true" ]]; then
+                      gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-amd64"
+            fi
+            if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+                      gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-arm64"
+            fi
+          fi
+
+          if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
+            gecho "  - name_template: ghcr.io/${{ github.repository }}:latest"
+            gecho "    image_templates:"
+            if [[ "${{ inputs.release-arch-amd64 }}" == "true" ]]; then
+                      gecho "      - ghcr.io/${{ github.repository }}:latest-amd64"
+            fi
+            if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
+                      gecho "      - ghcr.io/${{ github.repository }}:latest-arm64"
+            fi
+          fi
+
 
       - name: Determine project license(s)
         if: |

@@ -893,7 +893,7 @@ jobs:
         shell: bash
         run: |
           # check for config-breaking set if input params
-          if [[ ("${{ inputs.release-arch-arm64 }}" == "false" ) && ("${{ inputs.release-arch-arm64  == "false")" ]]; then
+          if [[ ("${{ inputs.release-arch-arm64 }}" == "false" ) && ("${{ inputs.release-arch-arm64 }} == "false")" ]]; then
             echo "error condition: release-docker must include either release-arch-arm64/amd64, both are false"
             exit -1
           fi

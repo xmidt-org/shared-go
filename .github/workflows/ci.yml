@@ -857,7 +857,7 @@ jobs:
           gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }-arm64"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-arm64"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then

@@ -800,7 +800,7 @@ jobs:
           gecho "      - \"--build-arg=ARCH=amd64\""
           gecho "      - \"--build-arg=PLATFORM=linux/amd64\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }-amd64"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
           gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}-amd64"
@@ -906,7 +906,7 @@ jobs:
             gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
           fi
           if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
-            gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }-arm64"
+            gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
           fi
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then

@@ -617,6 +617,9 @@ jobs:
       needs.license.result       != 'failure'
     runs-on: [ ubuntu-latest ]
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@fcd3152d8ad392d0e9c14d3f0de40f0a88b8ca0e #v3.6.0
+
       - name: Install syft for sbom generation
         uses: anchore/sbom-action/download-syft@f325610c9f50a54015d37c8d16cb3b0e2c8f4de0 # v0.18.0
 

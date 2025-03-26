@@ -851,18 +851,18 @@ jobs:
           gecho "      - \"--build-arg=ARCH=arm64\""
           gecho "      - \"--build-arg=PLATFORM=linux/arm64v8\""
           gecho "    image_templates:"
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:{{ .Tag }}"
+          gecho "      - ghcr.io/${{ github.repository }}:{{ .Tag }}-arm64"
 
           if [[ "${{ inputs.release-docker-major }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:v{{ .Major }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }-arm64}"
           fi
 
           if [[ "${{ inputs.release-docker-minor }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:v{{ .Major }}.{{ .Minor }}"
+          gecho "      - ghcr.io/${{ github.repository }}:v{{ .Major }}.{{ .Minor }}-arm64"
           fi
 
           if [[ "${{ inputs.release-docker-latest }}" == "true" ]]; then
-          gecho "      - ghcr.io/${{ github.repository }}-arm64:latest"
+          gecho "      - ghcr.io/${{ github.repository }}:latest-arm64"
           fi
 
           if [[ "${{ inputs.release-skip-publish }}" == "--skip-publish" ]]; then
@@ -900,10 +900,10 @@ jobs:
           gecho "  - name_template: ghcr.io/${{ github.repository }}:{{ .Tag }}"
           gecho "    image_templates:"
           if [[ "${{ inputs.release-arch-amd64 }}" == "true" ]]; then
-            gecho "      -  ghcr.io/${{ github.repository }}-amd64:{{ .Tag }}"
+            gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }}-amd64"
           fi
           if [[ "${{ inputs.release-arch-arm64 }}" == "true" ]]; then
-            gecho "      -  ghcr.io/${{ github.repository }}-arm64:{{ .Tag }}"
+            gecho "      -  ghcr.io/${{ github.repository }}:{{ .Tag }-arm64}"
           fi
 
       - name: Determine project license(s)

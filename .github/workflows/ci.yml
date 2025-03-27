@@ -662,6 +662,7 @@ jobs:
 
           echo "---" > .goreleaser.yml
           gecho() { echo "$1" >> .goreleaser.yml ; }
+          gecho "version: 2"
           gecho "project_name: ${project_name}"
           gecho ""
           if [[ ${{ inputs.go-generate-skip }} == "false" ]]; then

@@ -601,7 +601,8 @@ jobs:
     permissions:
       contents: write
       packages: write
-
+    outputs:
+      project_name: ${{ steps.common-go-releaser.outputs.project_name }}
     name: Release
     needs: [ build_program, unit_test, style, golint, license, copyright, ymllint ]
     if: |
@@ -651,6 +652,7 @@ jobs:
 
       - name: Generate common rules to the .goreleaser.yml file
         if: inputs.release-custom-file == false
+        id: common-go-releaser
         working-directory: ${{ inputs.working-directory }}
         shell: bash
         run: |
@@ -659,6 +661,7 @@ jobs:
             project_name=$(echo ${{ github.repository }} | sed 's:.*/::')
           fi
           echo "PROJECT_NAME=${project_name}" >> $GITHUB_ENV
+          echo "project_name=${project_name}" >> $GITHUB_OUTPUT
 
           echo "---" > .goreleaser.yml
           gecho() { echo "$1" >> .goreleaser.yml ; }
@@ -1178,6 +1181,24 @@ jobs:
         run: |
           rm -rf .secrets
 
+  Notify:
+    needs: release
+    if: needs.release.result == 'success'
+    name: Release-notification-${{ matrix.platform_repo }}
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        platform_repo: [xmidt,webpa,nion,anemoi]
+    env:
+      PROJECT_NAME: ${{ needs.release.outputs.project_name }}
+    steps:
+      - name: Notify Platform repo of new release
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+          repository: comcast-cl/${{ matrix.platform_repo }}
+          event-type: ${{ env.PROJECT_NAME }}-new-release
+          client-payload: '{"version": "${{ github.ref_name }}"}'
 
   all_passed:
     needs: [ build_program, unit_test, style, golint, license, copyright, release, ymllint ]

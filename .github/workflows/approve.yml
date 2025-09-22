@@ -5,6 +5,9 @@ name: 'Approve Dependabot'
 
 on:
   pull_request_target:
+permissions:
+  pull-requests: write
+  contents: write
 
 jobs:
   dependabot:

@@ -139,8 +139,9 @@ name: 'Automatically relase patch versions.'
 | # | Required | Type | Name | Default | Description |
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | 1 |  | string | branch | main | Branch to release from. |
-| 2 |  | string | patch-list | fix, bugfix, perf, refactor, test, tests, chore | Comma separated list of commit types that should trigger a patch release. |
-| 3 |  | string | which | tag | Create a 'release' or 'tag'. |
+| 2 |  | string | patch-list | fix, Fix, FIX, bugfix, Bugfix, BugFix, BUGFIX, perf, refactor, Refactor, REFACTOR, test, Test, TEST, tests, Tests, TESTS, chore, Chore, CHORE | Comma separated list of commit types that should trigger a patch release. |
+| 3 |  | string | minor-list | feat, Feat, FEAT, feature, Feature, FEATURE | The specific minor prefix names to use for minors. |
+| 4 |  | string | which | tag | Create a 'release' or 'tag'. |
 
 
 
@@ -176,7 +177,7 @@ jobs:
 
 | # | Required | Type | Name | Default | Description |
 | :--- | :---: | :---: | :--- | :--- | :--- |
-| 1 |  | string | go-version | ^1.20.x | The go version to use.  Example: '1.20.x' |
+| 1 |  | string | go-version | ^1.20.x | This input is deprecated. The value present in the go.mod file is used instead. |
 | 2 |  | boolean | go-version-latest | true | Will always use the latest version of go available. |
 | 3 |  | boolean | go-generate-skip | true | Skip running go generate if needed. |
 | 4 |  | string | go-generate-deps |  | The line sparated list of go generate dependencies to install via<br>`go install` prior to running `go generate`. |
@@ -193,30 +194,32 @@ jobs:
 | 15 |  | boolean | release-arch-arm64 | true | Set to enable arm64 binary and dockers to be built. |
 | 16 |  | string | release-binary-name |  | If the project needs a custom name, use set it here. |
 | 17 |  | boolean | release-custom-file | false | If the project needs a custom release file, use that instead. |
-| 18 |  | boolean | release-docker | false | If set to true, release a container to gocr as well. |
-| 19 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of<br>files/dirs to make available. |
-| 20 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of<br>`Dockerfile` in the project root. |
-| 21 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
-| 22 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for<br>the major version. |
-| 23 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
-| 24 |  | string | release-main-package | . | Path to main.go file or main package. |
-| 25 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
-| 26 |  | boolean | release-rpms | true | If set to true, release generic rpms as well. |
-| 27 |  | boolean | release-skip | false | Skip releasing the program. |
-| 28 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
-| 29 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
-| 30 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See<br>goreleaser nfpm contents for examples. |
-| 31 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the<br>program.  Otherwise root is assumed. |
-| 32 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
-| 33 |  | boolean | style-skip | false | Skip building the gofmt check. |
-| 34 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed<br>during unit tests.  Otherwise no race condition checking will be done. |
-| 35 |  | boolean | tests-skip | false | Skip running the unit tests. |
-| 36 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
-| 37 |  | boolean | yaml-lint-skip | true | Skip linting yaml files. |
+| 18 |  | boolean | release-debs | true | If set to true, release generic debs as well. |
+| 19 |  | boolean | release-docker | false | If set to true, release a container to gocr as well. |
+| 20 |  | string | release-docker-extras |  | Provides a way to set the `extra_files` field with the list of<br>files/dirs to make available. |
+| 21 |  | string | release-docker-file | Dockerfile | Set to the docker file and path if you don't want the default of<br>`Dockerfile` in the project root. |
+| 22 |  | boolean | release-docker-latest | false | If set to true, release this container as the latest. |
+| 23 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for<br>the major version. |
+| 24 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
+| 25 |  | string | release-main-package | . | Path to main.go file or main package. |
+| 26 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
+| 27 |  | boolean | release-rpms | true | If set to true, release generic rpms as well. |
+| 28 |  | boolean | release-skip | false | Skip releasing the program. |
+| 29 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
+| 30 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
+| 31 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See<br>goreleaser nfpm contents for examples. |
+| 32 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the<br>program.  Otherwise root is assumed. |
+| 33 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
+| 34 |  | boolean | style-skip | false | Skip building the gofmt check. |
+| 35 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed<br>during unit tests.  Otherwise no race condition checking will be done. |
+| 36 |  | boolean | tests-skip | false | Skip running the unit tests. |
+| 37 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
+| 38 |  | boolean | yaml-lint-skip | true | Skip linting yaml files. |
 
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

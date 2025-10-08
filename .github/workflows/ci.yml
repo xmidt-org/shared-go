@@ -1192,13 +1192,34 @@ jobs:
     env:
       PROJECT_NAME: ${{ needs.release.outputs.project_name }}
     steps:
+      - name: Strip leading 'v' from "${{ github.ref_name }}"
+        id: strip-v
+        if: startsWith(github.ref_name, 'v') && ${{ github.ref_name }} == "v[0-9]+\\.[0-9]+\\.[0-9]+"
+        run: |
+            export RELEASE=$(echo "release=${{ github.ref_name }}" | sed 's/^v//')
+            echo "Stripped leading v from tag name."
+            echo "Before: ${{ github.ref_name }}"
+            echo "After: $RELEASE"
+            echo "release=$RELEASE" >> $GITHUB_OUTPUT
+      
+      - name: Set release version
+        id: set-version
+        run: |
+          if [[ "${{ steps.strip-v.outputs.release }}" != "" ]]; then
+            echo "Using stripped version: ${{ steps.strip-v.outputs.release }} "
+            echo "version=${{ steps.strip-v.outputs.release }}" >> $GITHUB_OUTPUT
+          else
+            echo "Using original version: ${{ github.ref_name }}"
+            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Notify Platform repo of new release
         uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
           repository: comcast-cl/${{ matrix.platform_repo }}
           event-type: ${{ env.PROJECT_NAME }}-new-release
-          client-payload: '{"version": "${{ github.ref_name }}"}'
+          client-payload: '{"version": "${{ steps.set-version.outputs.version }}"}'
 
   all_passed:
     needs: [ build_program, unit_test, style, golint, license, copyright, release, ymllint ]

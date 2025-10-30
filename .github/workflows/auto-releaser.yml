@@ -34,12 +34,12 @@ on:
         required: false
         default: >
           bugfix, Bugfix, BugFix, BUGFIX,
-          chore, Chore, CHORE
+          chore, Chore, CHORE,
           fix, Fix, FIX,
           perf,
           refactor, Refactor, REFACTOR,
           test, Test, TEST,
-          tests, Tests, TESTS,
+          tests, Tests, TESTS
 
       minor-list:
         description: 'The specific minor prefix names to use for minors.'

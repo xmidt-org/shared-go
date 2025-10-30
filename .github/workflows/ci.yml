@@ -288,6 +288,8 @@ jobs:
     runs-on: [ ubuntu-latest ]
     if: inputs.build-skip == false
     name: Build Go Program
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -327,6 +329,8 @@ jobs:
     runs-on: [ ubuntu-latest ]
     name: Go Unit Tests
     if: inputs.tests-skip == false
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -395,6 +399,8 @@ jobs:
     outputs:
       docker_file_present: ${{ steps.build.outputs.docker_file_present }}
     name: Check Docker Build
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -417,6 +423,8 @@ jobs:
 
   goreportcard:
     runs-on: [ ubuntu-latest ]
+    permissions:
+      contents: read
     if: |
       inputs.goreportcard-skip == false &&
       github.event_name == 'push' ||
@@ -430,6 +438,8 @@ jobs:
     runs-on: [ ubuntu-latest ]
     name: Go format check
     if: inputs.style-skip == false
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -465,6 +475,9 @@ jobs:
     runs-on: [ ubuntu-latest ]
     name: Go Lint
     if: inputs.lint-skip == false
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -506,6 +519,8 @@ jobs:
   ymllint:
     runs-on: [ ubuntu-latest ]
     if: inputs.yaml-lint-skip == false
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -515,6 +530,8 @@ jobs:
   copyright:
     runs-on: [ ubuntu-latest ]
     if: inputs.copyright-skip == false
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -527,6 +544,8 @@ jobs:
     name: License Checker
     runs-on: [ ubuntu-latest ]
     if: inputs.license-skip == false
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -1188,7 +1207,7 @@ jobs:
     runs-on: [ubuntu-latest]
     strategy:
       matrix:
-        platform_repo: [xmidt,webpa,nion,anemoi]
+        platform_repo: [xmidt, webpa, nion, anemoi]
     env:
       PROJECT_NAME: ${{ needs.release.outputs.project_name }}
     steps:
@@ -1201,7 +1220,7 @@ jobs:
             echo "Before: ${{ github.ref_name }}"
             echo "After: $RELEASE"
             echo "release=$RELEASE" >> $GITHUB_OUTPUT
-      
+
       - name: Set release version
         id: set-version
         run: |
@@ -1226,6 +1245,8 @@ jobs:
     if: always()
     name: All checks passed check.
     runs-on: [ubuntu-latest]
+    permissions:
+      contents: read
     steps:
       - name: Fail unless required checks pass
         if: |

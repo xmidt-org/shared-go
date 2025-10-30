@@ -11,6 +11,9 @@ on:
     types:
       - opened
 
+permissions:
+  contents: read
+
 jobs:
   dependabot:
     uses: ./.github/workflows/proj.yml

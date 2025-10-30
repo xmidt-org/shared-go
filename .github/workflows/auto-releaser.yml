@@ -32,7 +32,14 @@ on:
         description: 'Comma separated list of commit types that should trigger a patch release.'
         type: string
         required: false
-        default: fix, Fix, FIX, bugfix, Bugfix, BugFix, BUGFIX, perf, refactor, Refactor, REFACTOR, test, Test, TEST, tests, Tests, TESTS, chore, Chore, CHORE
+        default: >
+          bugfix, Bugfix, BugFix, BUGFIX,
+          chore, Chore, CHORE
+          fix, Fix, FIX,
+          perf,
+          refactor, Refactor, REFACTOR,
+          test, Test, TEST,
+          tests, Tests, TESTS,
 
       minor-list:
         description: 'The specific minor prefix names to use for minors.'

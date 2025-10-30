@@ -8,6 +8,9 @@ on:
     - cron: '0 12 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
     uses: ./.github/workflows/auto-releaser.yml

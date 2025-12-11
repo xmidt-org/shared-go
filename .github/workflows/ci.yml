@@ -26,19 +26,18 @@
 #      release-type: program    # or: library
 #    secrets: inherit
 ---
-name: 'CI Workflow'
+name: "CI Workflow"
 
 on:
   workflow_call:
     inputs:
-
       # General or common inputs.  These cross cut concerns generally and shouldn't
       # be included in the more targetted sections below.
       go-version:
         description: "This input is deprecated. The value present in the go.mod file is used instead."
         required: false
         type: string
-        default: '^1.20.x'
+        default: "^1.20.x"
       go-version-latest:
         description: "Will always use the latest version of go available."
         required: false
@@ -55,65 +54,62 @@ on:
           `go install` prior to running `go generate`.
         required: false
         type: string
-        default: ''
+        default: ""
       working-directory:
-        description: 'The working directory for this project.'
+        description: "The working directory for this project."
         required: false
         type: string
         default: .
       description:
-        description: 'What this project/package does.'
+        description: "What this project/package does."
         required: false
         type: string
-        default: '${{ github.repository }} does something important.'
+        default: "${{ github.repository }} does something important."
       license:
         description: "The license this project should use if it doesn't support REUSE/SPDX."
         required: false
         type: string
-
 
       # Alphabetize the sections & prefix the names of the sections to the
       # parameters associated, so maintenance and discovery is easier.
 
       # Build focused
       build-skip:
-        description: 'Skip building the program.'
+        description: "Skip building the program."
         required: false
         type: boolean
         default: false
 
       # Goreportcard focused
       goreportcard-skip:
-        description: 'Skip running the goreportcard update.'
+        description: "Skip running the goreportcard update."
         required: false
         type: boolean
         default: false
 
       # Lint focused
       lint-skip:
-        description: 'Skip running the lint check.'
+        description: "Skip running the lint check."
         required: false
         type: boolean
         default: false
       lint-timeout:
-        description: 'The timeout to pass on to the linter.'
+        description: "The timeout to pass on to the linter."
         required: false
         type: string
-        default: '5m'
+        default: "5m"
       lint-version:
-        description: 'The working directory for this project.'
+        description: "The working directory for this project."
         required: false
         type: string
-        default: 'latest'
-
+        default: "latest"
 
       # License focused
       license-skip:
-        description: 'Skip building the license check.'
+        description: "Skip building the license check."
         required: false
         type: boolean
         default: false
-
 
       # Release focused
       release-arch-amd64:
@@ -163,7 +159,7 @@ on:
           `Dockerfile` in the project root.
         required: false
         type: string
-        default: 'Dockerfile'
+        default: "Dockerfile"
 
       release-docker-latest:
         description: "If set to true, release this container as the latest."
@@ -189,13 +185,13 @@ on:
         description: "Path to main.go file or main package."
         required: false
         type: string
-        default: '.'
+        default: "."
 
       release-project-name:
         description: "The project name / binary name to use if not the repo name."
         required: false
         type: string
-        default: ''
+        default: ""
 
       release-rpms:
         description: "If set to true, release generic rpms as well."
@@ -204,7 +200,7 @@ on:
         default: true
 
       release-skip:
-        description: 'Skip releasing the program.'
+        description: "Skip releasing the program."
         required: false
         type: boolean
         default: false
@@ -213,7 +209,7 @@ on:
         description: "Set to --skip-publish to skip publishing."
         required: false
         type: string
-        default: ''
+        default: ""
 
       release-type:
         description: "The type of artifact to expect and release. [ `library`, `program` ]."
@@ -226,7 +222,7 @@ on:
           goreleaser nfpm contents for examples.
         required: false
         type: string
-        default: ''
+        default: ""
 
       release-with-unique-user:
         description: |
@@ -236,22 +232,19 @@ on:
         type: string
         default: "true"
 
-
       # Copyright focused
       copyright-skip:
-        description: 'Skip validating that all files have copyright and licensing information.'
+        description: "Skip validating that all files have copyright and licensing information."
         required: false
         type: boolean
         default: false
-
 
       # Style/code format focused
       style-skip:
-        description: 'Skip building the gofmt check.'
+        description: "Skip building the gofmt check."
         required: false
         type: boolean
         default: false
-
 
       # Unit test focused
       tests-race:
@@ -262,30 +255,28 @@ on:
         type: boolean
         default: true
       tests-skip:
-        description: 'Skip running the unit tests.'
+        description: "Skip running the unit tests."
         required: false
         type: boolean
         default: false
 
       # Artifact uploading focused
       upload-skip:
-        description: 'Skip uploading the artifacts.'
+        description: "Skip uploading the artifacts."
         required: false
         type: boolean
         default: false
 
       # YML linting focused
       yaml-lint-skip:
-        description: 'Skip linting yaml files.'
+        description: "Skip linting yaml files."
         required: false
         type: boolean
         default: true
 
 jobs:
-
-
   build_program:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     if: inputs.build-skip == false
     name: Build Go Program
     permissions:
@@ -324,9 +315,8 @@ jobs:
         run: |
           go build    ./...
 
-
   unit_test:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     name: Go Unit Tests
     if: inputs.tests-skip == false
     permissions:
@@ -335,7 +325,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Setup go version
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
@@ -389,13 +379,12 @@ jobs:
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           directory: ${{ inputs.working-directory }}
-          flags:     unittests
-          token:     ${{ secrets.CODECOV_TOKEN }}
-
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   docker_check:
     if: inputs.release-docker
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     outputs:
       docker_file_present: ${{ steps.build.outputs.docker_file_present }}
     name: Check Docker Build
@@ -422,7 +411,7 @@ jobs:
           fi
 
   goreportcard:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     permissions:
       contents: read
     if: |
@@ -433,9 +422,8 @@ jobs:
       - name: Go report card
         uses: creekorful/goreportcard-action@v1.0
 
-
   style:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     name: Go format check
     if: inputs.style-skip == false
     permissions:
@@ -470,9 +458,8 @@ jobs:
           path: ${{ inputs.working-directory }}/fmt.patch
           retention-days: 10
 
-
   golint:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     name: Go Lint
     if: inputs.lint-skip == false
     permissions:
@@ -517,7 +504,7 @@ jobs:
           skip-cache: true
 
   ymllint:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     if: inputs.yaml-lint-skip == false
     permissions:
       contents: read
@@ -528,7 +515,7 @@ jobs:
       - uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c # v3.1.1
 
   copyright:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     if: inputs.copyright-skip == false
     permissions:
       contents: read
@@ -539,10 +526,9 @@ jobs:
       - name: REUSE Compliance Check
         uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v5
 
-
   license:
     name: License Checker
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     if: inputs.license-skip == false
     permissions:
       contents: read
@@ -623,7 +609,8 @@ jobs:
     outputs:
       project_name: ${{ steps.common-go-releaser.outputs.project_name }}
     name: Release
-    needs: [ build_program, unit_test, style, golint, license, copyright, ymllint ]
+    needs:
+      [build_program, unit_test, style, golint, license, copyright, ymllint]
     if: |
       always() &&
       inputs.release-skip        == false     &&
@@ -635,7 +622,7 @@ jobs:
       needs.ymllint.result       != 'failure' &&
       needs.copyright.result     != 'failure' &&
       needs.license.result       != 'failure'
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 #v3.6.0
@@ -965,7 +952,6 @@ jobs:
             fi
           fi
 
-
       - name: Determine project license(s)
         if: |
           inputs.release-custom-file == false     &&
@@ -1127,7 +1113,6 @@ jobs:
           gecho ""
           fi
 
-
       - name: Show the .goreleaser.yml file
         working-directory: ${{ inputs.working-directory }}
         shell: bash
@@ -1182,16 +1167,16 @@ jobs:
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         with:
           distribution: goreleaser
-          workdir:      ${{ inputs.working-directory }}
-          version:      '~> v2'
-          args:         release --clean --skip=validate ${{ env.SKIP_PUBLISH }}
+          workdir: ${{ inputs.working-directory }}
+          version: "~> v2"
+          args: release --clean --skip=validate ${{ env.SKIP_PUBLISH }}
         env:
-          GORELEASER_CURRENT_TAG:         ${{ github.ref_name }}
-          GITHUB_TOKEN:                   ${{ secrets.GITHUB_TOKEN }}
-          NFPM_PASSPHRASE:                ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
-          NFPM_DEFAULT_PASSPHRASE:        ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
-          NFPM_DEFAULT_RPM_PASSPHRASE:    ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
-          NFPM_DEFAULT_DEB_PASSPHRASE:    ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NFPM_PASSPHRASE: ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
+          NFPM_DEFAULT_PASSPHRASE: ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
+          NFPM_DEFAULT_RPM_PASSPHRASE: ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
+          NFPM_DEFAULT_DEB_PASSPHRASE: ${{ secrets.RPM_GPG_PRIVATE_PASSWORD }}
 
       - name: Remove .secrets directory
         if: |
@@ -1211,36 +1196,26 @@ jobs:
     env:
       PROJECT_NAME: ${{ needs.release.outputs.project_name }}
     steps:
-      - name: Strip leading 'v' from "${{ github.ref_name }}"
-        id: strip-v
+      - name: Set release version
+        id: set-version
         if: startsWith(github.ref_name, 'v')
         shell: bash
         run: |
-            if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-            else
-              echo "Tag does not match expected version format (v*.*.*), skipping"
-              exit 0
-            fi
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
             echo "Stripped leading v from tag name."
             echo "Before: ${{ github.ref_name }}"
             echo "After: $RELEASE"
-            echo "release=$RELEASE" >> $GITHUB_OUTPUT
-
-      - name: Set release version
-        id: set-version
-        shell: bash
-        run: |
-          if [[ "${{ steps.strip-v.outputs.release }}" != "" ]]; then
-            echo "Using stripped version: ${{ steps.strip-v.outputs.release }} "
-            echo "version=${{ steps.strip-v.outputs.release }}" >> $GITHUB_OUTPUT
+            echo "version=$RELEASE" >> $GITHUB_OUTPUT
+            echo "valid=true" >> $GITHUB_OUTPUT
           else
-            echo "Using original version: ${{ github.ref_name }}"
-            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "Tag does not match expected version format (v*.*.*), skipping"
+            echo "valid=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Notify Platform repo of new release
-        uses: peter-evans/repository-dispatch@v4
+        if: steps.set-version.outputs.valid == 'true'
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
           token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
           repository: comcast-cl/${{ matrix.platform_repo }}
@@ -1248,7 +1223,17 @@ jobs:
           client-payload: '{"version": "${{ steps.set-version.outputs.version }}"}'
 
   all_passed:
-    needs: [ build_program, unit_test, style, golint, license, copyright, release, ymllint ]
+    needs:
+      [
+        build_program,
+        unit_test,
+        style,
+        golint,
+        license,
+        copyright,
+        release,
+        ymllint,
+      ]
     if: always()
     name: All checks passed check.
     runs-on: [ubuntu-latest]

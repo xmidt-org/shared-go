@@ -1214,6 +1214,7 @@ jobs:
       - name: Strip leading 'v' from "${{ github.ref_name }}"
         id: strip-v
         if: startsWith(github.ref_name, 'v')
+        shell: bash
         run: |
             if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
@@ -1228,6 +1229,7 @@ jobs:
 
       - name: Set release version
         id: set-version
+        shell: bash
         run: |
           if [[ "${{ steps.strip-v.outputs.release }}" != "" ]]; then
             echo "Using stripped version: ${{ steps.strip-v.outputs.release }} "

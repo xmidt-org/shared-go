@@ -1200,7 +1200,7 @@ jobs:
         run: |
           rm -rf .secrets
 
-  Notify:
+  notify:
     needs: release
     if: needs.release.result == 'success'
     name: Release-notification-${{ matrix.platform_repo }}
@@ -1224,7 +1224,7 @@ jobs:
             echo "version=$RELEASE" >> $GITHUB_OUTPUT
             echo "valid=true" >> $GITHUB_OUTPUT
           else
-            echo "Tag does not match expected version format (v*.*.*), skipping"
+            echo "Tag does not match expected version format (e.g., v1.2.3), skipping"
             echo "valid=false" >> $GITHUB_OUTPUT
           fi
 

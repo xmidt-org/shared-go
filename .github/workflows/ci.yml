@@ -1200,7 +1200,7 @@ jobs:
         run: |
           rm -rf .secrets
 
-  Notify:
+  notify:
     needs: release
     if: needs.release.result == 'success'
     name: Release-notification-${{ matrix.platform_repo }}
@@ -1211,34 +1211,26 @@ jobs:
     env:
       PROJECT_NAME: ${{ needs.release.outputs.project_name }}
     steps:
-      - name: Strip leading 'v' from "${{ github.ref_name }}"
-        id: strip-v
+      - name: Set release version
+        id: set-version
         if: startsWith(github.ref_name, 'v')
+        shell: bash
         run: |
-            if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-            else
-              echo "Tag does not match expected version format (v*.*.*), skipping"
-              exit 0
-            fi
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
             echo "Stripped leading v from tag name."
             echo "Before: ${{ github.ref_name }}"
             echo "After: $RELEASE"
-            echo "release=$RELEASE" >> $GITHUB_OUTPUT
-
-      - name: Set release version
-        id: set-version
-        run: |
-          if [[ "${{ steps.strip-v.outputs.release }}" != "" ]]; then
-            echo "Using stripped version: ${{ steps.strip-v.outputs.release }} "
-            echo "version=${{ steps.strip-v.outputs.release }}" >> $GITHUB_OUTPUT
+            echo "version=$RELEASE" >> $GITHUB_OUTPUT
+            echo "valid=true" >> $GITHUB_OUTPUT
           else
-            echo "Using original version: ${{ github.ref_name }}"
-            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "Tag does not match expected version format (e.g., v1.2.3), skipping"
+            echo "valid=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Notify Platform repo of new release
-        uses: peter-evans/repository-dispatch@v4
+        if: steps.set-version.outputs.valid == 'true'
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
           token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
           repository: comcast-cl/${{ matrix.platform_repo }}

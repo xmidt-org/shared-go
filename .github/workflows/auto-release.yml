@@ -13,5 +13,6 @@ permissions:
 
 jobs:
   release:
+    permissions: write-all
     uses: ./.github/workflows/auto-releaser.yml
     secrets: inherit

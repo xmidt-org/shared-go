@@ -16,4 +16,6 @@ jobs:
     permissions:
       contents: write
     uses: ./.github/workflows/auto-releaser.yml
+    with:
+      tag-filter: '^(?!v1[.]).*$'
     secrets: inherit

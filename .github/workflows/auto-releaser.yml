@@ -47,6 +47,20 @@ on:
         required: false
         default: feat, Feat, FEAT, feature, Feature, FEATURE
 
+      tag-filter:
+        description: |
+          A string to filter tags by.  By default allows all tags.  This is
+          useful if you want to only consider tags that match a certain pattern
+          for the next version calculation.
+
+          Primarily this is used to ignore older tags in the shared-go repo that
+          are used for testing the release process.
+
+          This is mapped directly into the ietf-tools/semver-action 'tagFilter' input.
+        type: string
+        required: false
+        default: '^.+$'
+
       which:
         description: Create a 'release' or 'tag'.
         type: string
@@ -73,6 +87,7 @@ jobs:
           minorList:             ${{ inputs.minor-list }}
           noVersionBumpBehavior: silent
           noNewCommitBehavior:   silent
+          tagFilter:             ${{ inputs.tag-filter }}
 
       - name: No Release Needed
         if: |

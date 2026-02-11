@@ -139,9 +139,10 @@ name: 'Automatically relase patch versions.'
 | # | Required | Type | Name | Default | Description |
 | :--- | :---: | :---: | :--- | :--- | :--- |
 | 1 |  | string | branch | main | Branch to release from. |
-| 2 |  | string | patch-list | fix, Fix, FIX, bugfix, Bugfix, BugFix, BUGFIX, perf, refactor, Refactor, REFACTOR, test, Test, TEST, tests, Tests, TESTS, chore, Chore, CHORE | Comma separated list of commit types that should trigger a patch release. |
+| 2 |  | string | patch-list | bugfix, Bugfix, BugFix, BUGFIX, chore, Chore, CHORE, fix, Fix, FIX, perf, refactor, Refactor, REFACTOR, test, Test, TEST, tests, Tests, TESTS<br> | Comma separated list of commit types that should trigger a patch release. |
 | 3 |  | string | minor-list | feat, Feat, FEAT, feature, Feature, FEATURE | The specific minor prefix names to use for minors. |
-| 4 |  | string | which | tag | Create a 'release' or 'tag'. |
+| 4 |  | string | tag-filter | ^.+$ | A string to filter tags by.  By default allows all tags.  This is<br>useful if you want to only consider tags that match a certain pattern<br>for the next version calculation.<br><br>Primarily this is used to ignore older tags in the shared-go repo that<br>are used for testing the release process.<br><br>This is mapped directly into the ietf-tools/semver-action 'tagFilter' input. |
+| 5 |  | string | which | tag | Create a 'release' or 'tag'. |
 
 
 
@@ -219,6 +220,7 @@ jobs:
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

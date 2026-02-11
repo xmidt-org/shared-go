@@ -22,15 +22,14 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   command:
     # Normally don't use a workflow without the @{ref}.  In this case, we want
     # to run the workflow specified by the branch instead of what is associated
     # with a reference so we can test that the change works.
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:
@@ -46,6 +45,8 @@ jobs:
 
   command-tag:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/')
     with:
@@ -71,6 +72,8 @@ jobs:
 
   program:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:
@@ -86,6 +89,8 @@ jobs:
 
   program-tag:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/')
     with:
@@ -112,6 +117,8 @@ jobs:
 
   library:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:
@@ -125,6 +132,8 @@ jobs:
 
   library-tag:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/')
     with:
@@ -144,6 +153,8 @@ jobs:
 
   slow-things:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:
@@ -157,6 +168,8 @@ jobs:
 
   slow-things-library:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
     if: |
       startsWith(github.ref, 'refs/tags/') == false
     with:

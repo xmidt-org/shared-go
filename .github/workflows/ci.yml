@@ -1205,6 +1205,8 @@ jobs:
     if: needs.release.result == 'success'
     name: Release-notification-${{ matrix.platform_repo }}
     runs-on: [ubuntu-latest]
+    permissions:
+      contents: read
     strategy:
       matrix:
         platform_repo: [xmidt, webpa, nion, anemoi]

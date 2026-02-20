@@ -1239,7 +1239,7 @@ jobs:
           event-type: ${{ env.PROJECT_NAME }}-new-release
           client-payload: |
             '{
-              "app_name": "${{ env.PROJECT_NAME }}",
+              "app-name": "${{ env.PROJECT_NAME }}",
               "repository": "${{ github.repository }}",
               "version": "${{ steps.set-version.outputs.version }}",
             }'

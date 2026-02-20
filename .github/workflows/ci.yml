@@ -1237,7 +1237,12 @@ jobs:
           token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
           repository: comcast-cl/${{ matrix.platform_repo }}
           event-type: ${{ env.PROJECT_NAME }}-new-release
-          client-payload: '{"version": "${{ steps.set-version.outputs.version }}"}'
+          client-payload: |
+            '{
+              "app_name": "${{ env.PROJECT_NAME }}",
+              "repository": "${{ github.repository }}",
+              "version": "${{ steps.set-version.outputs.version }}",
+            }'
 
   all_passed:
     needs: [ build_program, unit_test, style, golint, license, copyright, release, ymllint ]

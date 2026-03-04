@@ -638,7 +638,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 #v3.6.0
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a #v3.6.0
 
       - name: Install syft for sbom generation
         uses: anchore/sbom-action/download-syft@17ae1740179002c89186b61233e0f892c3118b11 # v0.23.0

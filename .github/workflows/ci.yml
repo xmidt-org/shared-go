@@ -367,7 +367,7 @@ jobs:
         shell: bash
         run: |
           go test -v ${{ inputs.tests-race && '-race' || '' }} -coverprofile=coverage.txt ./...
-          go test ${{ inputs.tests-race && '-race' || '' }} -json > report.json ./...
+          go test ${{ inputs.tests-race && '-race' || '' }} -json  ./... > report.json
 
       # upload report as artifact
       - name: Archive unit tests report

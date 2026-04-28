@@ -67,6 +67,24 @@ on:
         required: false
         default: tag
 
+      release-ignore-paths:
+        description: |
+          Newline-separated list of glob patterns. If every file changed since
+          the last matched tag falls within these patterns, the auto-release
+          is skipped — preventing patch bumps from chore(deps) or docs/CI
+          commits that didn't touch shippable code. Pass an empty string to
+          disable the check.
+        type: string
+        required: false
+        default: |
+          .github/**
+          **/*.md
+          LICENSE
+          LICENSES/**
+          .reuse/**
+          .gitignore
+          .gitattributes
+
 jobs:
   release:
     permissions:
@@ -76,6 +94,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
 
       - name: Get Next Version
         id: semver
@@ -89,14 +109,42 @@ jobs:
           noNewCommitBehavior:   silent
           tagFilter:             ${{ inputs.tag-filter }}
 
+      - name: Check for release-worthy changes
+        id: should-release
+        if: steps.semver.outputs.next != ''
+        shell: bash
+        env:
+          PREVIOUS_TAG: ${{ steps.semver.outputs.current }}
+          IGNORE_PATHS: ${{ inputs.release-ignore-paths }}
+        run: |
+          if [ -z "$PREVIOUS_TAG" ] || [ -z "$IGNORE_PATHS" ]; then
+            echo "First release or ignore list disabled — proceeding."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          EXCLUDES=()
+          while IFS= read -r pattern; do
+            [ -z "$pattern" ] && continue
+            EXCLUDES+=( ":(glob,exclude)$pattern" )
+          done <<< "$IGNORE_PATHS"
+          if git diff --quiet "$PREVIOUS_TAG" HEAD -- '.' "${EXCLUDES[@]}"; then
+            echo "Only ignored paths changed since $PREVIOUS_TAG; skipping release."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Release-worthy changes detected since $PREVIOUS_TAG."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: No Release Needed
         if: |
-          steps.semver.outputs.next == ''
+          steps.semver.outputs.next == '' ||
+          steps.should-release.outputs.release == 'false'
         run: echo "No release needed."
 
       - name: Create Release
         if: |
           steps.semver.outputs.next != '' &&
+          steps.should-release.outputs.release == 'true' &&
           inputs.which == 'release'
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
@@ -108,6 +156,7 @@ jobs:
       - name: Create Tag
         if: |
           steps.semver.outputs.next != '' &&
+          steps.should-release.outputs.release == 'true' &&
           inputs.which == 'tag'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
@@ -123,6 +172,7 @@ jobs:
       - name: Failure
         if: |
           steps.semver.outputs.next != '' &&
+          steps.should-release.outputs.release == 'true' &&
           inputs.which != 'release' &&
           inputs.which != 'tag'
         run: |

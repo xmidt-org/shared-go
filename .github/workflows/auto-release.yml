@@ -18,4 +18,5 @@ jobs:
     uses: ./.github/workflows/auto-releaser.yml
     with:
       tag-filter: '^(?!v1[.]).*$'
+      release-ignore-paths: ""
     secrets: inherit

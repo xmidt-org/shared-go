@@ -85,6 +85,16 @@ on:
           .gitignore
           .gitattributes
 
+    secrets:
+      PERSONAL_ACCESS_TOKEN:
+        description: |
+          A GitHub Personal Access Token with repo permissions, used to create
+          the release tag. Optional. Provide it when additional workflows need
+          to be triggered by tag creation (e.g. CI workflows that run on release
+          tags) — tags pushed with the default GITHUB_TOKEN do not trigger other
+          workflows. When omitted, tagging falls back to GITHUB_TOKEN.
+        required: false
+
 jobs:
   release:
     permissions:
@@ -160,7 +170,7 @@ jobs:
           inputs.which == 'tag'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
-          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN || github.token }}
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,

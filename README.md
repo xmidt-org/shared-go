@@ -143,8 +143,14 @@ name: 'Automatically relase patch versions.'
 | 3 |  | string | minor-list | feat, Feat, FEAT, feature, Feature, FEATURE | The specific minor prefix names to use for minors. |
 | 4 |  | string | tag-filter | ^.+$ | A string to filter tags by.  By default allows all tags.  This is<br>useful if you want to only consider tags that match a certain pattern<br>for the next version calculation.<br><br>Primarily this is used to ignore older tags in the shared-go repo that<br>are used for testing the release process.<br><br>This is mapped directly into the ietf-tools/semver-action 'tagFilter' input. |
 | 5 |  | string | which | tag | Create a 'release' or 'tag'. |
+| 6 |  | string | release-ignore-paths | .github/**<br>**/*.md<br>LICENSE<br>LICENSES/**<br>.reuse/**<br>.gitignore<br>.gitattributes<br> | Newline-separated list of glob patterns. If every file changed since<br>the last matched tag falls within these patterns, the auto-release<br>is skipped — preventing patch bumps from chore(deps) or docs/CI<br>commits that didn't touch shippable code. Pass an empty string to<br>disable the check. |
 
 
+### Secrets
+
+| # | Required | Name | Description |
+| :--- | :---: | :--- | :--- |
+| 1 |  | PERSONAL_ACCESS_TOKEN | A GitHub Personal Access Token with repo permissions, used to create<br>the release tag. Optional. Provide it when additional workflows need<br>to be triggered by tag creation (e.g. CI workflows that run on release<br>tags) — tags pushed with the default GITHUB_TOKEN do not trigger other<br>workflows. When omitted, tagging falls back to GITHUB_TOKEN. |
 
 ## 2: CI Workflow
 ## Golang CI Workflow Sample
@@ -220,6 +226,7 @@ jobs:
 
 
 <!-- @overwrite-anchor=end -->
+
 
 
 

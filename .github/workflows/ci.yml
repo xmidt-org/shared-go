@@ -569,7 +569,7 @@ jobs:
           version: 4.x
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch Org Approved Licenses & merge to local
+      - name: Merge Org Approved Licenses to local
         shell: bash
         run: |
           if [ -f .licensed.yml ]; then
@@ -582,13 +582,106 @@ jobs:
           if [ ! -f .licensed_local.yml ]; then
             touch .licensed_local.yml
           fi
-          curl -L -s -f \
-            --max-time    10 \
-            --retry       5 \
-            --retry-delay 1 \
-            -H 'Accept: application/vnd.github.v3.raw' \
-            https://api.github.com/repos/xmidt-org/.github/contents/licensing/org-approved.yml?ref=main \
-            -o .licensed_common.yml
+          cat > .licensed_common.yml << 'ORG_APPROVED_EOF'
+          # SPDX-FileCopyrightText: 2023 Comcast Cable Communications Management, LLC
+          # SPDX-License-Identifier: Apache-2.0
+          # This is the org wide approved licenses and reviewed repos with exceptions
+          ---
+          # Please keep alphabetized
+          allowed:
+            - mit
+            - apache-2.0
+            - bsd-2-clause
+            - bsd-3-clause
+            - isc
+            - mpl-2.0
+
+          # Please keep alphabetized & on the far right, call out the specific license(s)
+          # that apply.  Use the spdx license name for consistency.
+          reviewed:
+            go:
+              - emperror.dev/errors                                                       # mit
+              - github.com/aws/aws-sdk-go-v2/internal/sync/singleflight                   # bsd-3-clause
+              - github.com/aws/smithy-go/internal/sync/singleflight                       # bsd-3-clause
+              - github.com/bgentry/speakeasy                                              # mit, apache-2.0 (windows)
+              - github.com/blang/semver                                                   # mit
+              - github.com/cheggaaa/pb                                                    # bsd-3-clause
+              - github.com/cloudfoundry-community/vaultkv                                 # unlicense
+              - github.com/djherbis/times                                                 # mit
+              - github.com/emirpasic/gods/**/*                                            # bsd-2-clause, mit
+              - github.com/emperror/emperror                                              # mit
+              - github.com/fsnotify/fsnotify                                              # bsd-3-clause
+              - github.com/gocql/gocql                                                    # bsd-3-clause
+              - github.com/gocql/gocql/**/*                                               # bsd-3-clause
+              - github.com/gofrs/flock                                                    # bsd-3-clause
+              - github.com/gofrs/uuid                                                     # mit
+              - github.com/gogo/protobuf/**/*                                             # bsd-3-clause
+              - github.com/golang/glog                                                    # apache-2.0
+              - github.com/golang/protobuf/**/*                                           # bsd-3-clause
+              - github.com/goph/emperror                                                  # mit
+              - github.com/gorilla/mux                                                    # bsd-3-clause
+              - github.com/gorilla/schema                                                 # bsd-3-clause
+              - github.com/go-zookeeper/zk                                                # bsd-3-clause
+              - github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc                      # bsd-3-clause
+              - github.com/hashicorp/errwrap                                              # mpl-2.0
+              - github.com/hashicorp/go-multierror                                        # mpl-2.0
+              - github.com/hashicorp/hcl                                                  # mpl-2.0
+              - github.com/hashicorp/hcl/**/*                                             # mpl-2.0
+              - github.com/jbenet/go-context/io                                           # mit
+              - github.com/jtacoma/uritemplates                                           # bsd-3-clause
+              - github.com/jmespath/go-jmespath                                           # apache-2.0
+              - github.com/kevinburke/ssh_config                                          # mit
+              - github.com/klauspost/compress                                             # bsd-3-clause, apache-2.0, mit
+              - github.com/klauspost/compress/**/*                                        # bsd-3-clause, apache-2.0, mit
+              - github.com/leodido/go-urn                                                 # mit
+              - github.com/magiconair/properties                                          # bsd-2-clause
+              - github.com/Masterminds/sprig                                              # mit
+              - github.com/mattn/go-runewidth                                             # mit
+              - github.com/miekg/dns                                                      # bsd-3-clause
+              - github.com/mitchellh/go-homedir                                           # mit
+              - github.com/mitchellh/mapstructure                                         # mit
+              - github.com/munnerz/goautoneg                                              # bsd-3-clause
+              - github.com/munnerz/goautoneg/**/*                                         # bsd-3-clause
+              - github.com/opentracing/basictracer-go                                     # apache-2.0
+              - github.com/pmezard/go-difflib                                             # bsd-3-clause
+              - github.com/pmezard/go-difflib/**/*                                        # bsd-3-clause
+              - github.com/rcrowley/go-metrics                                            # bsd-2-clause
+              - github.com/sagikazarmark/slog-shim                                        # bsd-3-clause
+              - github.com/src-d/gcfg                                                     # bsd-3-clause
+              - github.com/src-d/gcfg/**/*                                                # bsd-3-clause
+              - github.com/subosito/gotenv                                                # mit
+              - github.com/texttheater/golang-levenshtein/levenshtein                     # mit
+              - github.com/tinylib/msgp/msgp                                              # mit
+              - github.com/tsenart/vegeta                                                 # mit
+              - github.com/tsenart/vegeta/*                                               # mit
+              - github.com/tweekmonster/luser                                             # mit
+              - github.com/uber/jaeger-client-go                                          # apache-2.0
+              - github.com/uber/jaeger-client-go/**/*                                     # apache-2.0
+              - github.com/uber/jaeger-lib/metrics                                        # apache-2.0
+              - github.com/xanzy/ssh-agent                                                # apache-2.0
+              - golang.org/x/*                                                            # bsd-3-clause
+              - golang.org/x/**/*                                                         # bsd-3-clause
+              - google.golang.org/genproto/googleapis/rpc/status                          # apache-2.0
+              - google.golang.org/grpc                                                    # apache-2.0
+              - google.golang.org/grpc/**/*                                               # apache-2.0
+              - google.golang.org/protobuf                                                # bsd-3-clause
+              - google.golang.org/protobuf/**/*                                           # bsd-3-clause
+              - gopkg.in/ini.v1                                                           # apache-2.0
+              - gopkg.in/src-d/go-billy.v4                                                # apache-2.0
+              - gopkg.in/src-d/go-billy.v4/**/*                                           # apache-2.0
+              - gopkg.in/src-d/go-git.v4                                                  # apache-2.0
+              - gopkg.in/src-d/go-git.v4/**/*                                             # apache-2.0
+              - gopkg.in/warnings.v0                                                      # bsd-2-clause
+              - gopkg.in/yaml.v2                                                          # apache-2.0
+              - gopkg.in/inf.v0                                                           # bsd-3-clause
+              - go.uber.org/atomic                                                        # mit
+              - go.uber.org/dig                                                           # mit
+              - go.uber.org/dig/**/*                                                      # mit
+              - go.uber.org/fx                                                            # mit
+              - go.yaml.in/yaml/v2                                                        # apache-2.0
+              - sourcegraph.com/sourcegraph/appdash                                       # mit
+              - sourcegraph.com/sourcegraph/appdash/**/*                                  # mit
+          ORG_APPROVED_EOF
           yq eval-all '. as $item ireduce ({}; . *+  $item)' .licensed_local.yml .licensed_common.yml > .licensed.yml
 
       - name: Fetch all dependencies

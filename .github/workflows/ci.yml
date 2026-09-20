@@ -191,6 +191,12 @@ on:
         type: string
         default: '.'
 
+      release-notify-skip:
+        description: "Skip notifying the platform repos of a new release.  Notification is already skipped when release-type is `library`."
+        required: false
+        type: boolean
+        default: false
+
       release-project-name:
         description: "The project name / binary name to use if not the repo name."
         required: false
@@ -1295,7 +1301,12 @@ jobs:
 
   notify:
     needs: release
-    if: needs.release.result == 'success'
+    # The platform repos react to a new application release.  A library has
+    # nothing to deploy, so it is never announced; anything else can opt out.
+    if: |
+      needs.release.result == 'success' &&
+      inputs.release-type != 'library' &&
+      !inputs.release-notify-skip
     name: Release-notification-${{ matrix.platform_repo }}
     runs-on: [ubuntu-latest]
     permissions:

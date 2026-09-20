@@ -203,19 +203,20 @@ jobs:
 | 23 |  | boolean | release-docker-major | false | If set to true, release this container as the latest for<br>the major version. |
 | 24 |  | boolean | release-docker-minor | false | If set to true, release this container as the latest for the minor version. |
 | 25 |  | string | release-main-package | . | Path to main.go file or main package. |
-| 26 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
-| 27 |  | boolean | release-rpms | true | If set to true, release generic rpms as well. |
-| 28 |  | boolean | release-skip | false | Skip releasing the program. |
-| 29 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
-| 30 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
-| 31 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See<br>goreleaser nfpm contents for examples. |
-| 32 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the<br>program.  Otherwise root is assumed. |
-| 33 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
-| 34 |  | boolean | style-skip | false | Skip building the gofmt check. |
-| 35 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed<br>during unit tests.  Otherwise no race condition checking will be done. |
-| 36 |  | boolean | tests-skip | false | Skip running the unit tests. |
-| 37 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
-| 38 |  | boolean | yaml-lint-skip | true | Skip linting yaml files. |
+| 26 |  | boolean | release-notify-skip | false | Skip notifying the platform repos of a new release.  Notification is<br>already skipped when release-type is `library`. |
+| 27 |  | string | release-project-name |  | The project name / binary name to use if not the repo name. |
+| 28 |  | boolean | release-rpms | true | If set to true, release generic rpms as well. |
+| 29 |  | boolean | release-skip | false | Skip releasing the program. |
+| 30 |  | string | release-skip-publish |  | Set to --skip-publish to skip publishing. |
+| 31 | ✅ | string | release-type |  | The type of artifact to expect and release. [ `library`, `program` ]. |
+| 32 |  | string | release-with-extra-contents |  | The list of any extra files to include in the packaged releases.  See<br>goreleaser nfpm contents for examples. |
+| 33 |  | string | release-with-unique-user | true | If set to true will add a user and group with the same name as the<br>program.  Otherwise root is assumed. |
+| 34 |  | boolean | copyright-skip | false | Skip validating that all files have copyright and licensing information. |
+| 35 |  | boolean | style-skip | false | Skip building the gofmt check. |
+| 36 |  | boolean | tests-race | true | If set to "true" (default), race condition checking will be performed<br>during unit tests.  Otherwise no race condition checking will be done. |
+| 37 |  | boolean | tests-skip | false | Skip running the unit tests. |
+| 38 |  | boolean | upload-skip | false | Skip uploading the artifacts. |
+| 39 |  | boolean | yaml-lint-skip | true | Skip linting yaml files. |
 
 
 

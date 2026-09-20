@@ -427,18 +427,6 @@ jobs:
               --label "org.opencontainers.image.revision=${{ github.sha }}"
           fi
 
-  goreportcard:
-    runs-on: [ ubuntu-latest ]
-    permissions:
-      contents: read
-    if: |
-      inputs.goreportcard-skip == false &&
-      github.event_name == 'push' ||
-      github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Go report card
-        uses: creekorful/goreportcard-action@1f35ced8cdac2cba28c9a2f2288a16aacfd507f9 # v1.0
-
 
   style:
     runs-on: [ ubuntu-latest ]

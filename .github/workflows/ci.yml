@@ -1287,54 +1287,54 @@ jobs:
         run: |
           rm -rf .secrets
 
-  notify:
-    needs: release
-    # The platform repos react to a new application release.  A library has
-    # nothing to deploy, so it is never announced; anything else can opt out.
-    if: |
-      needs.release.result == 'success' &&
-      inputs.release-type != 'library' &&
-      !inputs.release-notify-skip
-    name: Release-notification-${{ matrix.platform_repo }}
-    runs-on: [ubuntu-latest]
-    permissions:
-      contents: read
-    strategy:
-      matrix:
-        platform_repo: [xmidt, webpa, nion, anemoi]
-    env:
-      PROJECT_NAME: ${{ needs.release.outputs.project_name }}
-    steps:
-      - name: Set release version
-        id: set-version
-        if: startsWith(github.ref_name, 'v')
-        shell: bash
-        run: |
-          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-            echo "Stripped leading v from tag name."
-            echo "Before: ${{ github.ref_name }}"
-            echo "After: $RELEASE"
-            echo "version=$RELEASE" >> $GITHUB_OUTPUT
-            echo "valid=true" >> $GITHUB_OUTPUT
-          else
-            echo "Tag does not match expected version format (e.g., v1.2.3), skipping"
-            echo "valid=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Notify Platform repo of new release
-        if: steps.set-version.outputs.valid == 'true'
-        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
-        with:
-          token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
-          repository: comcast-cl/${{ matrix.platform_repo }}
-          event-type: ${{ env.PROJECT_NAME }}-new-release
-          client-payload: |
-            {
-              "app_name": "${{ env.PROJECT_NAME }}",
-              "repository": "${{ github.repository }}",
-              "version": "${{ steps.set-version.outputs.version }}"
-            }
+#  notify:
+#    needs: release
+#    # The platform repos react to a new application release.  A library has
+#    # nothing to deploy, so it is never announced; anything else can opt out.
+#    if: |
+#      needs.release.result == 'success' &&
+#      inputs.release-type != 'library' &&
+#      !inputs.release-notify-skip
+#    name: Release-notification-${{ matrix.platform_repo }}
+#    runs-on: [ubuntu-latest]
+#    permissions:
+#      contents: read
+#    strategy:
+#      matrix:
+#        platform_repo: [xmidt, webpa, nion, anemoi]
+#    env:
+#      PROJECT_NAME: ${{ needs.release.outputs.project_name }}
+#    steps:
+#      - name: Set release version
+#        id: set-version
+#        if: startsWith(github.ref_name, 'v')
+#        shell: bash
+#        run: |
+#          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+#            export RELEASE=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+#            echo "Stripped leading v from tag name."
+#            echo "Before: ${{ github.ref_name }}"
+#            echo "After: $RELEASE"
+#            echo "version=$RELEASE" >> $GITHUB_OUTPUT
+#            echo "valid=true" >> $GITHUB_OUTPUT
+#          else
+#            echo "Tag does not match expected version format (e.g., v1.2.3), skipping"
+#            echo "valid=false" >> $GITHUB_OUTPUT
+#          fi
+#
+#      - name: Notify Platform repo of new release
+#        if: steps.set-version.outputs.valid == 'true'
+#        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
+#        with:
+#          token: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+#          repository: comcast-cl/${{ matrix.platform_repo }}
+#          event-type: ${{ env.PROJECT_NAME }}-new-release
+#          client-payload: |
+#            {
+#              "app_name": "${{ env.PROJECT_NAME }}",
+#              "repository": "${{ github.repository }}",
+#              "version": "${{ steps.set-version.outputs.version }}"
+#            }
 
   all_passed:
     needs: [ build_program, unit_test, style, golint, license, copyright, release, ymllint ]

@@ -557,6 +557,18 @@ jobs:
         with:
           ruby-version: ruby
 
+      # The licensed gem depends on rugged, which builds a static libgit2 linked
+      # against libcrypto.  On ubuntu-26.04 OpenSSL's static libcrypto requires
+      # libjitterentropy, so install its headers or the native build fails.
+      # See https://github.com/libgit2/rugged/pull/1017
+      - name: Install rugged build dependencies
+        shell: bash
+        run: |
+          if pkg-config --libs --static libcrypto | grep -q jitterentropy; then
+            sudo apt-get update
+            sudo apt-get install -y libjitterentropy3-dev
+          fi
+
       - name: Setup licensed
         uses: licensee/setup-licensed@0d52e575b3258417672be0dff2f115d7db8771d8 # v1.3.2
         with:
